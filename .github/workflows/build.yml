@@ -12,5 +12,4 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v2
       - name: Docker build
-        run: echo OK
-
+        run: make docker

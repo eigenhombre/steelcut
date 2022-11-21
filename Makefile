@@ -1,4 +1,4 @@
-.PHONY: clean install test
+.PHONY: clean install test docker
 
 steelcut: src/*.lisp
 	./build.sh
@@ -8,6 +8,9 @@ test:
 
 clean:
 	rm -rf steelcut
+
+docker:
+	docker build -t steelcut .
 
 install: steelcut
 	test -n "$(BINDIR)"  # $$BINDIR
