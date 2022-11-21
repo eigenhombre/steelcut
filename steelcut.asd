@@ -8,6 +8,7 @@
   :depends-on (:arrows
                :cl-fad
                :cl-oju
+               :file-attributes
                :str)
   :components ((:module "src"
                 :components ((:file "package")

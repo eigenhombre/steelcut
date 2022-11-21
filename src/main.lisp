@@ -39,14 +39,6 @@
 PROJNAME
 "))
 
-(defun add-package-lisp (projname)
-  (render-project-file projname
-                       "src/package.lisp"
-                       "(defpackage PROJNAME
-  (:use :cl :arrows)
-  (:export :main))
-"))
-
 (defun add-main-lisp (projname)
   (render-project-file projname
                        "src/main.lisp"
@@ -54,6 +46,33 @@ PROJNAME
 
 (defun main ()
   (format t \"Thanks for using PROJNAME!~%\"))
+"))
+
+(defun add-main-package (projname)
+  (render-project-file projname
+                       "src/package.lisp"
+                       "(defpackage PROJNAME
+  (:use :cl :arrows)
+  (:export :main))
+"))
+
+(defun add-test-lisp (projname)
+  (render-project-file projname
+                       "test/test.lisp"
+                       "(in-package #:PROJNAME.test)
+
+(defun run-tests () (1am:run))
+
+(test example
+  (is (equal 2 (+ 1 1))))
+"))
+
+(defun add-test-package (projname)
+  (render-project-file projname
+                       "test/package.lisp"
+                       "(defpackage :PROJNAME.test
+  (:use :cl :1am)
+  (:export :run-tests))
 "))
 
 (defun add-makefile (projname)
@@ -75,8 +94,8 @@ install: PROJNAME
 	cp PROJNAME ${BINDIR}
 "))
 
-(defun chmod (mode path)
-  (uiop:run-program (list "chmod" mode (str path))))
+(defun make-executable (path)
+  (setf (attributes path) #o755))
 
 (defun add-build-sh (projname)
   (render-project-file projname
@@ -95,7 +114,27 @@ sbcl --non-interactive \\
      --eval '(ql:quickload :PROJNAME)' \\
      --eval '(progn (sb-ext:disable-debugger) (sb-ext:save-lisp-and-die \"PROJNAME\" :toplevel #'\"'\"'PROJNAME:main :executable t))'
 ")
-  (chmod "+x" (join/ (project-path projname) "build.sh")))
+  (make-executable (join/ (project-path projname) "build.sh")))
+
+(defun add-test-sh (projname)
+  (render-project-file projname
+                       "test.sh"
+                       "#!/bin/sh
+
+# Adapted from
+# https://github.com/cicakhq/potato/blob/master/tools/build_binary.sh;
+# Quicklisp path hack from
+# https://www.darkchestnut.com/2016/quicklisp-load-personal-projects-from-arbitrary-locations/
+
+sbcl --non-interactive \\
+     --disable-debugger \\
+     --eval '(pushnew (truename \".\") ql:*local-project-directories*)' \\
+     --eval '(ql:register-local-projects)' \\
+     --eval '(ql:quickload :1AM)' \\
+     --eval '(ql:quickload :PROJNAME)' \\
+     --eval '(asdf:test-system :PROJNAME/test)'
+")
+  (make-executable (join/ (project-path projname) "test.sh")))
 
 (defun add-asd (projname)
   (render-project-file projname
@@ -129,10 +168,13 @@ sbcl --non-interactive \\
 (defun make-project (projname)
   (ensure-directories-exist (str (project-path projname) "/"))
   (add-gitignore projname)
-  (add-package-lisp projname)
   (add-main-lisp projname)
+  (add-test-lisp projname)
+  (add-main-package projname)
+  (add-test-package projname)
   (add-makefile projname)
   (add-build-sh projname)
+  (add-test-sh projname)
   (add-asd projname)
   t)
 
@@ -156,12 +198,11 @@ sbcl --non-interactive \\
   (fad:delete-directory-and-files (project-path projname)))
 
 (comment
- (find-project "food")
+ (destroy-project!!! "foo")
  (make-project "foo")
- (find-project "foo")
 
  (project-path "foo")
- (destroy-project!!! "foo")
+ (find-project "foo")
  (find-project "foo")
  (project-contents "foo"))
 
@@ -183,4 +224,3 @@ sbcl --non-interactive \\
            (format t
                    "Project ~a created.  Thanks for using steelcut!~%"
                    appname))))))
-

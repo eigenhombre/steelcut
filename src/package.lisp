@@ -1,3 +1,9 @@
 (defpackage steelcut
-  (:use :cl :arrows :cl-fad :cl-oju :str)
+  (:use
+   :arrows
+   :cl
+   :cl-fad
+   :cl-oju
+   :org.shirakumo.file-attributes
+   :str)
   (:export :main))
