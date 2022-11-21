@@ -12,7 +12,7 @@ project generator.
 
 Very very alpha.  I'm using it, probably nobody else is.
 
-Tested only on (+ SBCL (or (Mac M1) (+ (Docker Ubuntu))))).
+Tested only on (+ SBCL (or (Mac M1) (+ Docker Ubuntu)))).
 
 # Building
 
@@ -21,8 +21,8 @@ Tested only on (+ SBCL (or (Mac M1) (+ (Docker Ubuntu))))).
 - SBCL
 - Make
 
-Check out this repo.  Make sure LISP_HOME is defined and you're in
-that directory. Then, assuming you want to build a project `myproject`,
+Check out this repo.  Make sure `LISP_HOME` is defined and you're in
+that directory. Then,
 
     make
     # Optionally:
@@ -30,9 +30,10 @@ that directory. Then, assuming you want to build a project `myproject`,
 
 # Usage
 
+Assuming you want to build a project `myproject`,
+
     steelcut myproject  # Prepend ./ if you didn't `make install`.
-    cd ../myproject
-    # Build the new project:
+    cd $LISP_HOME/myproject
     make
     # Optionally:
     make install
