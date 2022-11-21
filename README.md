@@ -1,5 +1,7 @@
 # Steelcut
 
+![build](https://github.com/eigenhombre/steelcut/actions/workflows/build.yml/badge.svg)
+
 <img src="/steel.jpg" width="400">
 
 A port to Common Lisp of
