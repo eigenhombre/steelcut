@@ -25,8 +25,8 @@ Check out this repo.  Make sure `LISP_HOME` is defined and you're in
 that directory. Then,
 
     make
-    # Optionally:
-    make install  # Assumes BINDIR defined and on your PATH; I use ~/bin
+    # Assuming BINDIR defined and on your PATH; I use ~/bin ...:
+    make install
 
 # Example of Usage
 
