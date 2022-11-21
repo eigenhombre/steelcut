@@ -26,7 +26,7 @@ that directory. Then,
 
     make
     # Optionally:
-    make install  # Assumes BINDIR defined; I use ~/bin
+    make install  # Assumes BINDIR defined and on your PATH; I use ~/bin
 
 # Example of Usage
 
