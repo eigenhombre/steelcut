@@ -8,6 +8,36 @@ A port to Common Lisp of
 [Oatmeal](https://github.com/eigenhombre/oatmeal/), a Common Lisp
 project generator.
 
+# Status
+
+Very very alpha.  I'm using it, probably nobody else is.
+
+Tested only on (+ SBCL (or (Mac M1) (+ (Docker Ubuntu))))).
+
+# Building
+
+## Prerequisites
+
+- SBCL
+- Make
+
+Check out this repo.  Make sure LISP_HOME is defined and you're in
+that directory. Then, assuming you want to build a project `myproject`,
+
+    make
+    # Optionally:
+    make install  # Assumes BINDIR defined; I use ~/bin
+
+# Usage
+
+    steelcut myproject  # Prepend ./ if you didn't `make install`.
+    cd ../myproject
+    # Build the new project:
+    make
+    # Optionally:
+    make install
+    myproject           # Prepend ./ if you didn't `make install`.
+
 # License
 
 MIT License
