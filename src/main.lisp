@@ -207,7 +207,7 @@ sbcl --non-interactive \\
  (project-contents "foo"))
 
 (defun usage ()
-  "Usage: PROJNAME <appname>")
+  "Usage: steelcut <appname>")
 
 (defun main ()
   (let* ((args sb-ext::*posix-argv*)

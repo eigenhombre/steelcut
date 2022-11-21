@@ -28,16 +28,44 @@ that directory. Then,
     # Optionally:
     make install  # Assumes BINDIR defined; I use ~/bin
 
-# Usage
+# Example of Usage
 
 Assuming you want to build a project `myproject`,
 
-    steelcut myproject  # Prepend ./ if you didn't `make install`.
-    cd $LISP_HOME/myproject
-    make
-    # Optionally:
-    make install
-    myproject           # Prepend ./ if you didn't `make install`.
+    $ steelcut
+    Usage: steelcut <appname>
+    $ steelcut myproject
+    Project myproject created.  Thanks for using steelcut!
+    $ cd $LISP_HOME/myproject
+    $ make
+    ./build.sh
+    This is SBCL 2.2.6, an implementation of ANSI Common Lisp.
+    More information about SBCL is available at <http://www.sbcl.org/>.
+
+    SBCL is free software, provided as is, with absolutely no warranty.
+    It is mostly in the public domain; some portions are provided under
+    BSD-style licenses.  See the CREDITS and COPYING files in the
+    distribution for more information.
+    To load "myproject":
+      Load 1 ASDF system:
+        myproject
+    ; Loading "myproject"
+    [package myproject]
+    [undoing binding stack and other enclosing state... done]
+    [performing final GC... done]
+    [saving current Lisp image into myproject:
+    writing 1840 bytes from the read-only space at 0x300000000
+    writing 1840 bytes from the static space at 0x300200000
+    writing 0 bytes from the immobile space at 0x300300000
+    writing 42270720 bytes from the dynamic space at 0x7003000000
+    done]
+    $ make install
+    test -n "/Users/jacobsen/bin"  # $BINDIR
+    cp myproject /Users/jacobsen/bin
+    $ cd
+    $ myproject
+    Thanks for using myproject!
+    $
 
 # License
 
