@@ -20,7 +20,7 @@ ENV BINDIR=/home/janice/bin
 WORKDIR /home/janice/steelcut
 
 # Run the unit tests:
-COPY *.asd *.sh Makefile /home/janice/steelcut
+COPY *.asd *.sh Makefile /home/janice/steelcut/
 COPY src /home/janice/steelcut/src
 COPY test /home/janice/steelcut/test
 # RUN make test-ecl
