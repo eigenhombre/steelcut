@@ -16,9 +16,20 @@ RUN echo | ecl --load /home/janice/quicklisp/setup.lisp --eval '(ql:add-to-init-
 RUN echo | sbcl --load /home/janice/quicklisp/setup.lisp --eval '(ql:add-to-init-file)' --quit
 
 ENV LISP_HOME=/home/janice/quicklisp/local-projects
+ENV BINDIR=/home/janice/bin
 WORKDIR /home/janice/steelcut
 
 # Run the unit tests:
-COPY . /home/janice/steelcut
+COPY *.asd *.sh Makefile /home/janice/steelcut
+COPY src /home/janice/steelcut/src
+COPY test /home/janice/steelcut/test
 # RUN make test-ecl
-RUN make test
+RUN make clean test
+RUN make
+RUN mkdir /home/janice/bin
+RUN make install
+RUN $BINDIR/steelcut foo
+WORKDIR /home/janice/quicklisp/local-projects/foo
+RUN make
+RUN make install
+RUN $BINDIR/foo
