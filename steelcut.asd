@@ -7,7 +7,8 @@
   :entry-point "steelcut:main"
   :depends-on (:arrows
                :cl-fad
-               :cl-oju)
+               :cl-oju
+               :str)
   :components ((:module "src"
                 :components ((:file "package")
                              (:file "main" :depends-on ("package"))))))
