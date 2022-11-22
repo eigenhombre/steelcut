@@ -2,10 +2,6 @@
 
 ![build](https://github.com/eigenhombre/steelcut/actions/workflows/build.yml/badge.svg)
 
-| ![Blast Furnace Valve](https://github.com/eigenhombre/steelcut/blob/cfd6df4036375d35c8cba257c53ba373eca57e96/steel.jpg) |
-|:--:|
-| *Blast Furnace Bell, Oil on Panel, (c) 2020 John Jacobsen, All Rights Reserved* |
-
 <img src="/steel.jpg" width="400">
 
 A port to Common Lisp of
