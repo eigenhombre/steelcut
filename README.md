@@ -4,6 +4,8 @@
 
 <img src="/steel.jpg" width="400">
 
+> Steelworkers' Park Blast Furnace Bell, Oil on Panel, (c) 2020 J. Jacobsen
+
 A port to Common Lisp of
 [Oatmeal](https://github.com/eigenhombre/oatmeal/), a Common Lisp
 project generator.
