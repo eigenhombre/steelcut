@@ -75,6 +75,61 @@ PROJNAME
   (:export :run-tests))
 "))
 
+(defun add-dockerfile (projname)
+  (render-project-file projname
+                       "Dockerfile"
+                       "FROM ubuntu
+
+RUN apt-get -qq -y update
+RUN apt-get -qq -y upgrade
+
+RUN apt-get install -qq -y sbcl make curl git ecl
+
+# Pull down Quicklisp and install it
+RUN curl -s -o quicklisp.lisp http://beta.quicklisp.org/quicklisp.lisp
+
+RUN ecl --load quicklisp.lisp \\
+         --eval '(quicklisp-quickstart:install :path \"/home/janice/quicklisp\")' \\
+         --eval '(ql:quickload :1am)'
+
+RUN echo | ecl --load /home/janice/quicklisp/setup.lisp --eval '(ql:add-to-init-file)'
+RUN echo | sbcl --load /home/janice/quicklisp/setup.lisp --eval '(ql:add-to-init-file)' --quit
+
+ENV LISP_HOME=/home/janice/quicklisp/local-projects
+ENV BINDIR=/home/janice/bin
+RUN mkdir $BINDIR
+WORKDIR /home/janice/PROJNAME
+
+# Run the unit tests:
+COPY *.asd *.sh Makefile /home/janice/PROJNAME/
+COPY src /home/janice/PROJNAME/src
+COPY test /home/janice/PROJNAME/test
+RUN make clean test
+RUN make
+RUN make install
+RUN $BINDIR/PROJNAME
+"))
+
+(defun add-gha-build (projname)
+  (render-project-file projname
+                       ".github/workflows/build.yml"
+                       "name: Build
+
+on:
+  - workflow_dispatch
+  - push
+
+jobs:
+  build:
+    name: build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+      - name: Docker build
+        run: make docker
+"))
+
 (defun add-makefile (projname)
   (render-project-file projname
                        "Makefile"
@@ -88,6 +143,9 @@ test:
 
 clean:
 	rm -rf PROJNAME
+
+docker:
+	docker build -t PROJNAME .
 
 install: PROJNAME
 	test -n \"$(BINDIR)\"  # $$BINDIR
@@ -176,6 +234,8 @@ sbcl --non-interactive \\
   (add-build-sh projname)
   (add-test-sh projname)
   (add-asd projname)
+  (add-dockerfile projname)
+  (add-gha-build projname)
   t)
 
 (defun file-seq (path)
