@@ -47,22 +47,22 @@ To build `steelcut`, check out this repo and `cd` to it.  Then,
 
 # Example
 
-Assuming you want to call your new project `myproject`:
-
 ## Usage
 
     $ steelcut
     Usage: steelcut <appname>
     $
 
-## New Project
+Assuming you want to call your new project `myproject`:
+
+## Generate the New Project
 
     $ steelcut myproject
     Project myproject created.  Thanks for using steelcut!
     $ cd $LISP_HOME/myproject
     $
 
-## Building It
+## Build It
 
     $ make
     ./build.sh
@@ -88,16 +88,15 @@ Assuming you want to call your new project `myproject`:
     done]
     $
 
-## Installing It
+## Install It
 
     $ make install
     test -n "/Users/myusername/bin"  # $BINDIR
     cp myproject /Users/myusername/bin
     $
 
-## Running It
+## Run It
 
-    $ cd
     $ myproject
     Thanks for using myproject!
     $
