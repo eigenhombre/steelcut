@@ -8,6 +8,16 @@ A port to Common Lisp of
 [Oatmeal](https://github.com/eigenhombre/oatmeal/), a Common Lisp
 project generator.
 
+# Features
+
+This program provides a simple template for new Common Lisp projects, including:
+- Project run on SBCL, a free, fast and multi-platform Lisp system
+- Build stand-alone binaries for the current architecture with one command (`make`)
+- Install on current path (`make install`)
+- Run unit tests for current project (`make test`)
+- Run tests and build sample project within Docker (`make docker`)
+  - Do the above in the GitHub Actions CI system (see generated `build.yml`)
+
 # Status
 
 Very very alpha.  I'm using it, probably nobody else is.
