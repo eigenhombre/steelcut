@@ -10,13 +10,18 @@ project generator.
 
 # Features
 
-This program provides a simple template for new Common Lisp projects, including:
-- Project run on SBCL, a free, fast and multi-platform Lisp system
-- Build stand-alone binaries for the current architecture with one command (`make`)
+This program provides a simple template for new Common Lisp projects,
+including:
+- Projects can be generated and built using
+  [SBCL](https://en.wikipedia.org/wiki/Steel_Bank_Common_Lisp), a
+  free, fast and multi-platform Lisp system
+- Build stand-alone binaries for the current architecture with one
+  command (`make`)
 - Install on current path (`make install`)
 - Run unit tests for current project (`make test`)
 - Run tests and build sample project within Docker (`make docker`)
-  - Do the above in the GitHub Actions CI system (see generated `build.yml`)
+  - Do the above in the GitHub Actions CI system (see generated
+    `build.yml`)
 
 # Status
 
@@ -38,7 +43,7 @@ that directory. Then,
     # Assuming BINDIR defined and on your PATH; I use ~/bin ...:
     make install
 
-# Example of Usage
+# Example
 
 Assuming you want to build a project `myproject`,
 
