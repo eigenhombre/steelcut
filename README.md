@@ -27,7 +27,7 @@ including:
 
 Very very alpha.  I'm using it, probably nobody else is.
 
-Tested only on (+ SBCL (or (Mac M1) (+ Docker Ubuntu)))).
+Tested only on `(and SBCL (or (Mac M1) (and Docker Ubuntu))))`.
 
 # Building
 
