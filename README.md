@@ -2,7 +2,7 @@
 
 ![build](https://github.com/eigenhombre/steelcut/actions/workflows/build.yml/badge.svg)
 
-<img src="/steel.jpg" width="400">
+<img src="https://github.com/eigenhombre/steelcut/blob/c3b3cc2979850d0db9f793c4e18d9323be2b92c3/steel.jpg?raw=true" width="400">
 
 A port to Common Lisp of
 [Oatmeal](https://github.com/eigenhombre/oatmeal/), a Common Lisp
@@ -35,9 +35,11 @@ Tested only on (+ SBCL (or (Mac M1) (+ Docker Ubuntu)))).
 
 - SBCL
 - Make
+- `BINDIR` defined as an environment variable, directory is created,
+  and on your `PATH`.  I use `$HOME/bin`.
+- `LISP_HOME` also exists as a directory and defined.
 
-Check out this repo.  Make sure `LISP_HOME` is defined and you're in
-that directory. Then,
+To build `steelcut`, check out this repo and `cd` to it.  Then,
 
     make
     # Assuming BINDIR defined and on your PATH; I use ~/bin ...:
@@ -45,13 +47,23 @@ that directory. Then,
 
 # Example
 
-Assuming you want to build a project `myproject`,
+Assuming you want to call your new project `myproject`:
+
+## Usage
 
     $ steelcut
     Usage: steelcut <appname>
+    $
+
+## New Project
+
     $ steelcut myproject
     Project myproject created.  Thanks for using steelcut!
     $ cd $LISP_HOME/myproject
+    $
+
+## Building It
+
     $ make
     ./build.sh
     This is SBCL 2.2.6, an implementation of ANSI Common Lisp.
@@ -74,9 +86,17 @@ Assuming you want to build a project `myproject`,
     writing 0 bytes from the immobile space at 0x300300000
     writing 42270720 bytes from the dynamic space at 0x7003000000
     done]
+    $
+
+## Installing It
+
     $ make install
-    test -n "/Users/jacobsen/bin"  # $BINDIR
-    cp myproject /Users/jacobsen/bin
+    test -n "/Users/myusername/bin"  # $BINDIR
+    cp myproject /Users/myusername/bin
+    $
+
+## Running It
+
     $ cd
     $ myproject
     Thanks for using myproject!
