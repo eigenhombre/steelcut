@@ -105,7 +105,7 @@ Assuming you want to call your new project `myproject`:
 
 MIT License
 
-Copyright (c) 2022 John Jacobsen
+Copyright (c) 2022-2025 John Jacobsen
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
