@@ -25,7 +25,7 @@
     (spit path contents)))
 
 (defun replace-project (projname s)
-  (replace-all "PROJNAME" projname s))
+  (cl-ppcre:regex-replace-all "PROJNAME" s projname))
 
 (defun render-project-file (projname filename contents)
   (add-project-file projname

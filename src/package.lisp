@@ -4,6 +4,6 @@
    :cl
    :cl-fad
    :cl-oju
-   :org.shirakumo.file-attributes
-   :str)
+   :cl-ppcre
+   :org.shirakumo.file-attributes)
   (:export :main))
