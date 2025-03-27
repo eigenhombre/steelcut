@@ -1,5 +1,7 @@
 (in-package #:steelcut.test)
 
+(defun run-tests () (1am:run))
+
 (defun rmdir (path)
   (uiop:delete-directory-tree (pathname path) :validate t))
 
