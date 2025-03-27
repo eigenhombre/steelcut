@@ -6,13 +6,6 @@
 (defun lisp-home ()
   (or *lisp-home* (uiop:getenv "LISP_HOME")))
 
-(defun join-w-sep (sep args)
-  (let ((sep-fmt (format nil "~~{~~a~~^~a~~}" sep)))
-    (format nil sep-fmt args)))
-
-(defun join/ (&rest args)
-  (join-w-sep "/" args))
-
 (defun project-path (projname)
   (join/ (lisp-home) projname))
 

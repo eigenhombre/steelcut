@@ -62,4 +62,23 @@
                     (steelcut::write-app "testingapp"))))
       (is (search "testingapp already exists"
                   (with-out-str
-                    (steelcut::write-app "testingapp")))))))
+                    (steelcut::write-app "testingapp"))))))  )
+
+
+(test needed-files-created
+  (let ((appname "testingapp"))
+    (with-temporary-dir (d)
+      (with-testing-lisp-home ((namestring d))
+        (with-out-str
+          (steelcut::write-app appname))
+        (loop for file in '("Makefile"
+                            "Dockerfile"
+                            "build.sh"
+                            "test.sh"
+                            "src/main.lisp"
+                            "src/package.lisp"
+                            "test/test.lisp"
+                            "test/package.lisp")
+              do
+                 (let ((appdir (merge-pathnames appname d)))
+                   (is (uiop:file-exists-p (steelcut::join/ appdir file)))))))))
