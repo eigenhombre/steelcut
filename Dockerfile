@@ -15,6 +15,11 @@ RUN ecl --load quicklisp.lisp \
 RUN echo | ecl --load /home/janice/quicklisp/setup.lisp --eval '(ql:add-to-init-file)'
 RUN echo | sbcl --load /home/janice/quicklisp/setup.lisp --eval '(ql:add-to-init-file)' --quit
 
+# Get Ultralisp (cl-oju, etc.):
+RUN sbcl --eval '(ql-dist:install-dist "http://dist.ultralisp.org" :prompt nil)'
+# Installed once, doesn't need to be installed again:
+# RUN ecl --eval '(ql-dist:install-dist "http://dist.ultralisp.org" :prompt nil)'
+
 ENV LISP_HOME=/home/janice/quicklisp/local-projects
 ENV BINDIR=/home/janice/bin
 WORKDIR /home/janice/steelcut
