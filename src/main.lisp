@@ -1,6 +1,10 @@
 (in-package #:steelcut)
 
-(defun lisp-home () (uiop:getenv "LISP_HOME"))
+(defvar *lisp-home* nil
+  "If non-nil, overrides the environment variable LISP_HOME.")
+
+(defun lisp-home ()
+  (or *lisp-home* (uiop:getenv "LISP_HOME")))
 
 (defun join-w-sep (sep args)
   (let ((sep-fmt (format nil "~~{~~a~~^~a~~}" sep)))
@@ -269,18 +273,21 @@ sbcl --non-interactive \\
 (defun usage ()
   "Usage: steelcut <appname>")
 
+(defun write-app (&optional appname)
+  (cond
+    ((not appname)
+     (format t "~a~%"(usage)))
+
+    ((find-project appname)
+     (format t "Project ~a already exists!~%" appname))
+
+    (t (progn
+         (make-project appname)
+         (format t
+                 "Project ~a created.  Thanks for using steelcut!~%"
+                 appname)))))
+
 (defun main ()
   (let* ((args sb-ext::*posix-argv*)
          (appname (second args)))
-    (cond
-      ((not appname)
-       (format t "~a~%"(usage)))
-
-      ((find-project appname)
-       (format t "Project ~a already exists!~%" appname))
-
-      (t (progn
-           (make-project appname)
-           (format t
-                   "Project ~a created.  Thanks for using steelcut!~%"
-                   appname))))))
+    (write-app appname)))
