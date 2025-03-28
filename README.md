@@ -4,7 +4,7 @@
 
 <img src="https://github.com/eigenhombre/steelcut/blob/c3b3cc2979850d0db9f793c4e18d9323be2b92c3/steel.jpg?raw=true" width="400">
 
-A port to Common Lisp of
+An approximate port to Common Lisp of
 [Oatmeal](https://github.com/eigenhombre/oatmeal/), a Common Lisp
 project generator.
 
@@ -41,9 +41,9 @@ Tested only on `(and SBCL (or (Mac M1) (and Docker Ubuntu))))`.
 
 To build `steelcut`, check out this repo and `cd` to it.  Then,
 
-    make
+    $ make
     # Assuming BINDIR defined and on your PATH; I use ~/bin ...:
-    make install
+    $ make install
 
 # Example
 
