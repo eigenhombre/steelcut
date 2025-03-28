@@ -12,7 +12,6 @@
                :str)
   :components ((:module "src"
                 :components ((:file "package")
-                             (:file "util" :depends-on ("package"))
                              (:file "main" :depends-on ("package"))))))
 
 (defsystem :steelcut/test
@@ -24,7 +23,6 @@
   :components ((:module "test"
                 :serial t
                 :components ((:file "package")
-                             (:file "util" :depends-on ("package"))
-                             (:file "test"))))
+                             (:file "test" :depends-on ("package")))))
   :perform (asdf:test-op (op system)
                          (funcall (read-from-string "steelcut.test:run-tests"))))
