@@ -101,6 +101,24 @@ Assuming you want to call your new project `myproject`:
     Thanks for using myproject!
     $
 
+# Next Steps
+
+## Feature Selection
+
+It is planned to allow selection of optional features, with de-selectable
+defaults.  Examples:
+
+Select library only with no other defaults:
+
+    $ steelcut +lib -ci -docker -cl-oju
+
+Build a Web service app which accepts JSON requests:
+
+    $ steelcut +app +webserver +json
+
+`+` selects an option, and is optional. `-` deselects a (presumably default)
+option.
+
 # License
 
 MIT License
