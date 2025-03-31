@@ -1,5 +1,20 @@
 (in-package #:steelcut)
 
+(defparameter +default-features+
+  '(:cli :cmd :ci :docker :cl-oju))
+
+(defparameter +available-features+
+  (append +default-features+
+          '(:csv
+            :json
+            :time
+            :webclient
+            :webserver
+            :xml)))
+
+(defun has-feature (feature-name features)
+  (find feature-name features))
+
 (defun join-w-sep (sep args)
   (let ((sep-fmt (format nil "~~{~~a~~^~a~~}" sep)))
     (format nil sep-fmt args)))
@@ -227,7 +242,7 @@ sbcl --non-interactive \\
                          (funcall (read-from-string \"PROJNAME.test:run-tests\"))))
 "))
 
-(defun make-project (projname)
+(defun make-project (projname features)
   (ensure-directories-exist (str (project-path projname) "/"))
   (add-gitignore projname)
   (add-main-lisp projname)
@@ -238,8 +253,11 @@ sbcl --non-interactive \\
   (add-build-sh projname)
   (add-test-sh projname)
   (add-asd projname)
-  (add-dockerfile projname)
-  (add-gha-build projname)
+  (when (or (has-feature :ci features)
+            (has-feature :docker features))
+    (add-dockerfile projname))
+  (when (has-feature :ci features)
+    (add-gha-build projname))
   t)
 
 (defun file-seq (path)
@@ -273,7 +291,7 @@ sbcl --non-interactive \\
 (defun usage ()
   "Usage: steelcut <appname>")
 
-(defun write-app (&optional appname)
+(defun write-app (appname features)
   (cond
     ((not appname)
      (format t "~a~%"(usage)))
@@ -282,7 +300,7 @@ sbcl --non-interactive \\
      (format t "Project ~a already exists!~%" appname))
 
     (t (progn
-         (make-project appname)
+         (make-project appname features)
          (format t
                  "Project ~a created.  Thanks for using steelcut!~%"
                  appname)))))
@@ -290,4 +308,4 @@ sbcl --non-interactive \\
 (defun main ()
   (let* ((args sb-ext::*posix-argv*)
          (appname (second args)))
-    (write-app appname)))
+    (write-app appname +default-features+)))

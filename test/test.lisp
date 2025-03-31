@@ -52,25 +52,24 @@
 (test test-no-arguments-generates-usage-string
   (is (search "Usage: steelcut"
               (with-out-str
-                (steelcut::write-app)))))
+                (steelcut::write-app nil steelcut::+default-features+)))))
 
 (test temp-smoke-test-app
   (with-temporary-dir (d)
     (with-testing-lisp-home ((namestring d))
       (is (search "testingapp created."
                   (with-out-str
-                    (steelcut::write-app "testingapp"))))
+                    (steelcut::write-app "testingapp" steelcut::+default-features+))))
       (is (search "testingapp already exists"
                   (with-out-str
-                    (steelcut::write-app "testingapp"))))))  )
-
+                    (steelcut::write-app "testingapp" steelcut::+default-features+)))))))
 
 (test needed-files-created
   (let ((appname "testingapp"))
     (with-temporary-dir (d)
       (with-testing-lisp-home ((namestring d))
         (with-out-str
-          (steelcut::write-app appname))
+          (steelcut::write-app appname steelcut::+default-features+))
         (loop for file in '("Makefile"
                             "Dockerfile"
                             "build.sh"
