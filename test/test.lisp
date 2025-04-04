@@ -57,7 +57,7 @@
 (test temp-smoke-test-app
   (with-temporary-dir (d)
     (with-testing-lisp-home ((namestring d))
-      (is (search "testingapp created."
+      (is (search "testingapp created"
                   (with-out-str
                     (steelcut::write-app "testingapp" steelcut::+default-features+))))
       (is (search "testingapp already exists"
@@ -72,6 +72,7 @@
           (steelcut::write-app appname steelcut::+default-features+))
         (loop for file in '("Makefile"
                             "Dockerfile"
+                            ".github/workflows/build.yml"
                             "build.sh"
                             "test.sh"
                             "src/main.lisp"
@@ -81,3 +82,25 @@
               do
                  (let ((appdir (merge-pathnames appname d)))
                    (is (uiop:file-exists-p (steelcut::join/ appdir file)))))))))
+
+(test deselecting-ci-feature-turns-off-github-action-file
+  (let ((appname "testingapp"))
+    (with-temporary-dir (d)
+      (with-testing-lisp-home ((namestring d))
+        (with-out-str
+          (steelcut::write-app appname (remove :ci steelcut::+default-features+)))
+        (let ((file ".github/workflows/build.yml")
+              (appdir (merge-pathnames appname d)))
+          (is (not (uiop:file-exists-p (steelcut::join/ appdir file)))))))))
+
+(test parsing-arguments
+  (is (equal (steelcut::parse-args ())
+             (cons nil nil)))
+  (is (equal (steelcut::parse-args '("a"))
+             (cons '(:a) nil)))
+  (is (equal (steelcut::parse-args '("a" "-b"))
+             (cons '(:a) '(:b))))
+  (is (equal (steelcut::parse-args '("+a" "-b"))
+             (cons '(:a) '(:b))))
+  (is (equal (steelcut::parse-args '("+a" "-b" "c" "-d" "+e"))
+             (cons '(:a :c :e) '(:b :d)))))

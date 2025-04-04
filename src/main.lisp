@@ -288,8 +288,29 @@ sbcl --non-interactive \\
  (find-project "foo")
  (project-contents "foo"))
 
+(defun feature-list-string (features)
+  "Helper to format a list of features as a string."
+  (if (null features)
+      ""
+      (join-w-sep ", "
+                  (mapcar #'(lambda (x)
+                              (string-downcase (format nil "~a" x)))
+                          features))))
+
 (defun usage ()
-  "Usage: steelcut <appname>")
+  (format nil
+          "Usage: steelcut <appname> [option1 option2 ...]
+
+Available features: ~a
+
+Select with + to include a feature, deselect with -. For example:
+  steelcut myapp +cli -docker
+  steelcut myapp +cli +json
+
+The default features are: ~a
+"
+          (feature-list-string +available-features+)
+          (feature-list-string +default-features+)))
 
 (defun write-app (appname features)
   (cond
@@ -302,10 +323,96 @@ sbcl --non-interactive \\
     (t (progn
          (make-project appname features)
          (format t
-                 "Project ~a created.  Thanks for using steelcut!~%"
-                 appname)))))
+                 "Project ~a created (features: ~a).  Thanks for using steelcut!~%"
+                 appname
+                 (feature-list-string features))))))
+
+;; CLI argument parsing:
+(defun starts-with (s c)
+  (and (stringp s)
+       (> (length s) 0)
+       (char= (char s 0) c)))
+
+(defun starts-with-plus? (s)
+  (starts-with s #\+))
+
+(defun starts-with-minus? (s)
+  (starts-with s #\-))
+
+(defun remove-first-char (s)
+  (if (and (stringp s) (> (length s) 0))
+      (subseq s 1)
+      s))
+
+(defun kw (x)
+  (intern (string-upcase x) :keyword))
+
+;; FIXME: Remove when cl-oju is updated in Ultralisp:
+(defun distinct (coll)
+  "
+  Return a list of the distinct elements in COLL, preserving order
+  "
+  (let ((seen (make-hash-table :test #'equal))
+        (result '()))
+    (dolist (item coll)
+      (unless (gethash item seen)
+        (push item result)
+        (setf (gethash item seen) t)))
+    (nreverse result)))
+
+(defun parse-args (arglist)
+  ;; Return (selected . deselected) where
+  ;; - selected is a list of arguments starting with #\+ (plus)
+  ;;   or plain arguments (no + or - prefix);
+  ;; - deselected is a list of arguments starting with #\-.
+  (loop with ret = (cons nil nil)
+        for arg in arglist
+        do (cond
+             ;; Handle empty arglist:
+             ((null arglist)
+              (return ret))
+             ;; Handle explicit +:
+             ((starts-with-plus? arg)
+              (push (kw (remove-first-char arg))
+                    (car ret)))
+             ;; Handle explicit -:
+             ((starts-with-minus? arg)
+              (push (kw (remove-first-char arg))
+                    (cdr ret)))
+             ;; Handle plain arguments (no +/-):
+             (t
+              (push (kw arg) (car ret))))
+        finally (return (cons (nreverse (car ret))
+                              (nreverse (cdr ret))))))
+
+(defun supported-feature (kw)
+  "Check if the keyword is a supported feature."
+  (and (keywordp kw) (find kw +available-features+)))
+
+(defun error-quit (&rest args)
+  (apply #'println args)
+  (println (usage))
+  (uiop:quit 1))
+
+(defun select-args (parsed-args)
+  (destructuring-bind (selected . deselected) parsed-args
+    (let ((features (copy-list +default-features+)))
+      ;; Add selected features:
+      (dolist (s selected)
+        (when (not (supported-feature (kw s)))
+          (error-quit "Unsupported feature:" s))
+        (push s features))
+      ;; Remove deselected features:
+      (dolist (d deselected)
+        (when (not (supported-feature (kw d)))
+          (error-quit "Unsupported feature:" d))
+        (setf features (remove d features :test #'equal)))
+      (distinct features))))
 
 (defun main ()
   (let* ((args sb-ext::*posix-argv*)
-         (appname (second args)))
-    (write-app appname +default-features+)))
+         (appname (second args))
+         (features (select-args (parse-args (cddr args)))))
+    (if (find "-h" args :test #'equal)
+        (println (usage))
+        (write-app appname features))))
