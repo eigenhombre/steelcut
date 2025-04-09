@@ -1,11 +1,12 @@
 (in-package #:steelcut)
 
 (defparameter +default-features+
-  '(:cli :cmd :ci :docker :cl-oju))
+  '(:cli :ci :docker :cl-oju))
 
 (defparameter +available-features+
   (append +default-features+
           '(:csv
+            :cmd
             :json
             :time
             :webclient
@@ -58,14 +59,20 @@
 PROJNAME
 "))
 
-(defun add-main-lisp (projname)
+(defun add-main-lisp (projname features)
   (render-project-file projname
                        "src/main.lisp"
-                       "(in-package #:PROJNAME)
+                       (format nil
+                               "(in-package #:PROJNAME)
 
+~a
 (defun main ()
-  (format t \"Thanks for using PROJNAME!~%\"))
-"))
+  (format t \"Thanks for using PROJNAME!~~%\"))
+"
+                               (if (has-feature :cmd features)
+                                   "(defun cmd-example () (cmd:$cmd \"ls\"))
+"
+                                   ""))))
 
 (defun add-main-package (projname)
   (render-project-file projname
@@ -213,17 +220,23 @@ sbcl --non-interactive \\
 ")
   (make-executable (join/ (project-path projname) "test.sh")))
 
-(defun add-asd (projname)
-  (render-project-file projname
-                       (str projname ".asd")
-                       "(defsystem :PROJNAME
+(defparameter +default-deps+ (list :arrows :cl-oju))
+
+(defun add-asd (projname features)
+  (let ((deps
+          (if (has-feature :cmd features)
+              (cons :cmd +default-deps+)
+              +default-deps+)))
+    (render-project-file projname
+                         (str projname ".asd")
+                         (format nil "(defsystem :PROJNAME
   :description \"FIXME\"
   :author \"FIXME\"
   :license \"FIXME\"
   :build-operation \"program-op\"
   :build-pathname \"PROJNAME\"
   :entry-point \"PROJNAME:main\"
-  :depends-on (:arrows)
+  :depends-on (~{~S~^ ~})
   :components ((:module \"src\"
                 :components ((:file \"package\")
                              (:file \"main\" :depends-on (\"package\"))))))
@@ -240,19 +253,20 @@ sbcl --non-interactive \\
                              (:file \"test\"))))
   :perform (asdf:test-op (op system)
                          (funcall (read-from-string \"PROJNAME.test:run-tests\"))))
-"))
+" deps))))
 
 (defun make-project (projname features)
   (ensure-directories-exist (str (project-path projname) "/"))
   (add-gitignore projname)
-  (add-main-lisp projname)
+  (add-main-lisp projname features)
   (add-test-lisp projname)
   (add-main-package projname)
   (add-test-package projname)
   (add-makefile projname)
   (add-build-sh projname)
   (add-test-sh projname)
-  (add-asd projname)
+  ;; WIP: start adding deps as appropriate:
+  (add-asd projname features)
   (when (or (has-feature :ci features)
             (has-feature :docker features))
     (add-dockerfile projname))

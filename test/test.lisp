@@ -64,34 +64,77 @@
                   (with-out-str
                     (steelcut::write-app "testingapp" steelcut::+default-features+)))))))
 
+(defmacro with-setup (d appsym appname &body body)
+  "Test harness providing temporary target directory"
+  `(let ((,appsym ,appname))
+     (with-temporary-dir (,d)
+       (with-testing-lisp-home ((namestring d))
+         ,@body))))
+
+(defmacro no-output (&body body)
+  `(with-out-str ,@body))
+
 (test needed-files-created
-  (let ((appname "testingapp"))
-    (with-temporary-dir (d)
-      (with-testing-lisp-home ((namestring d))
-        (with-out-str
-          (steelcut::write-app appname steelcut::+default-features+))
-        (loop for file in '("Makefile"
-                            "Dockerfile"
-                            ".github/workflows/build.yml"
-                            "build.sh"
-                            "test.sh"
-                            "src/main.lisp"
-                            "src/package.lisp"
-                            "test/test.lisp"
-                            "test/package.lisp")
-              do
-                 (let ((appdir (merge-pathnames appname d)))
-                   (is (uiop:file-exists-p (steelcut::join/ appdir file)))))))))
+  (with-setup d appname "testingapp"
+    (no-output
+      (steelcut::write-app appname steelcut::+default-features+))
+    (loop for file in '("Makefile"
+                        "Dockerfile"
+                        ".github/workflows/build.yml"
+                        "build.sh"
+                        "test.sh"
+                        "src/main.lisp"
+                        "src/package.lisp"
+                        "test/test.lisp"
+                        "test/package.lisp")
+          do
+             (let ((appdir (merge-pathnames appname d)))
+               (is (uiop:file-exists-p (steelcut::join/ appdir file)))))))
 
 (test deselecting-ci-feature-turns-off-github-action-file
-  (let ((appname "testingapp"))
-    (with-temporary-dir (d)
-      (with-testing-lisp-home ((namestring d))
-        (with-out-str
-          (steelcut::write-app appname (remove :ci steelcut::+default-features+)))
-        (let ((file ".github/workflows/build.yml")
-              (appdir (merge-pathnames appname d)))
-          (is (not (uiop:file-exists-p (steelcut::join/ appdir file)))))))))
+  (with-setup d appname "testingapp"
+    (no-output
+      (steelcut::write-app appname (remove :ci steelcut::+default-features+)))
+    (let ((file ".github/workflows/build.yml")
+          (appdir (merge-pathnames appname d)))
+      (is (not (uiop:file-exists-p (steelcut::join/ appdir file)))))))
+
+(defun find-deps-in-asd-string (raw-asd)
+  (second (drop-while (lambda (x) (not (equal x :depends-on)))
+                      raw-asd)))
+
+(defun has-cmd-example-p (source)
+  (cl-ppcre:scan "(?i)\\(\\s*defun\\s+cmd-example\\b" source))
+
+(test adding-cmd-feature-adds-cmd-as-a-dependency
+  (with-setup d appname "testingapp"
+    (no-output
+      (steelcut::write-app appname steelcut::+default-features+))
+    (let* ((appdir (merge-pathnames appname d))
+           (deps
+             (find-deps-in-asd-string
+              (read-from-string
+               (slurp (steelcut::join/ appdir "testingapp.asd")))))
+           (main-text (slurp (steelcut::join/ appdir "src/main.lisp"))))
+      ;; :cmd is not there:
+      (is (not (find :cmd deps)))
+      ;; It doesn't contain the example function:
+      (is (not (has-cmd-example-p main-text)))))
+
+  ;; Add :cmd to features, should get the new dependency:
+  (with-setup d appname "test2"
+    (no-output
+      (steelcut::write-app appname (cons :cmd steelcut::+default-features+)))
+    (let* ((appdir (merge-pathnames appname d))
+           (deps
+             (find-deps-in-asd-string
+              (read-from-string
+               (slurp (steelcut::join/ appdir "test2.asd")))))
+           (main-text (slurp (steelcut::join/ appdir "src/main.lisp"))))
+      ;; :cmd is now there:
+      (is (find :cmd deps))
+      ;; It contains the example function:
+      (is (has-cmd-example-p main-text)))))
 
 (test parsing-arguments
   (is (equal (steelcut::parse-args ())
