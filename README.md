@@ -101,11 +101,9 @@ Assuming you want to call your new project `myproject`:
     Thanks for using myproject!
     $
 
-# Next Steps
-
 ## Feature Selection
 
-It is planned to allow selection of optional features, with de-selectable
+Some features in generated projects are optional, with de-selectable
 defaults.  Examples:
 
 Select library only with no other defaults:
@@ -118,6 +116,13 @@ Build a Web service app which accepts JSON requests:
 
 `+` selects an option, and is optional. `-` deselects a (presumably default)
 option.
+
+This is a work in progress.  The following features are implemented:
+
+- docker (enabled by default)
+- CI (enabled by default)
+- `cmd` (uses [Paul Rodriguez's library](https://github.com/ruricolist/cmd);
+  disabled by default.
 
 # License
 
