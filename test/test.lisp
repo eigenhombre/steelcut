@@ -106,7 +106,7 @@
 (defun has-cmd-example-p (source)
   (cl-ppcre:scan "(?i)\\(\\s*defun\\s+cmd-example\\b" source))
 
-(test adding-cmd-feature-adds-cmd-as-a-dependency
+(test cmd-feature-adds-dependency-and-example
   (with-setup d appname "testingapp"
     (no-output
       (steelcut::write-app appname steelcut::+default-features+))
