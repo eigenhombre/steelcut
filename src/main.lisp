@@ -68,10 +68,15 @@ PROJNAME
 
 ~a
 (defun main ()
-  (format t \"Thanks for using PROJNAME!~~%\"))
+~a  (format t \"Thanks for using PROJNAME!~~%\"))
 "
                                (if (has-feature :cmd features)
-                                   "(defun cmd-example () (cmd:$cmd \"ls\"))
+                                   "(defun cmd-example ()
+  (format t \"~a~%\" (cmd:$cmd \"ls\")))
+"
+                                   "")
+                               (if (has-feature :cmd features)
+                                   "  (cmd-example)
 "
                                    ""))))
 
@@ -296,15 +301,6 @@ sbcl --non-interactive \\
 
 (defun destroy-project!!! (projname)
   (fad:delete-directory-and-files (project-path projname)))
-
-(comment
- (destroy-project!!! "foo")
- (make-project "foo")
-
- (project-path "foo")
- (find-project "foo")
- (find-project "foo")
- (project-contents "foo"))
 
 (defun feature-list-string (features)
   "Helper to format a list of features as a string."
