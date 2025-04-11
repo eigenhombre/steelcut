@@ -365,19 +365,6 @@ The default features are: ~a
 (defun kw (x)
   (intern (string-upcase x) :keyword))
 
-;; FIXME: Remove when cl-oju is updated in Ultralisp:
-(defun distinct (coll)
-  "
-  Return a list of the distinct elements in COLL, preserving order
-  "
-  (let ((seen (make-hash-table :test #'equal))
-        (result '()))
-    (dolist (item coll)
-      (unless (gethash item seen)
-        (push item result)
-        (setf (gethash item seen) t)))
-    (nreverse result)))
-
 (defun parse-args (arglist)
   ;; Return (selected . deselected) where
   ;; - selected is a list of arguments starting with #\+ (plus)
