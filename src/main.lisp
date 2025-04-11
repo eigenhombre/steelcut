@@ -66,17 +66,26 @@ PROJNAME
                        (format nil
                                "(in-package #:PROJNAME)
 
-~a
+~a~a
 (defun main ()
-~a  (format t \"Thanks for using PROJNAME!~~%\"))
+~a~a  (format t \"Thanks for using PROJNAME!~~%\"))
 "
                                (if (has-feature :cmd features)
                                    "(defun cmd-example ()
   (format t \"~a~%\" (cmd:$cmd \"ls\")))
 "
                                    "")
+                               (if (has-feature :cl-oju features)
+                                   "(defun cl-oju-example ()
+  (format t \"~a~%\" (take-while (partial < 5) (range 10)))
+"
+                                   "")
                                (if (has-feature :cmd features)
                                    "  (cmd-example)
+"
+                                   "")
+                               (if (has-feature :cl-oju features)
+                                   "  (cl-oju-example)
 "
                                    ""))))
 
@@ -232,10 +241,14 @@ sbcl --non-interactive \\
 (defparameter +default-deps+ (list :arrows :cl-oju))
 
 (defun add-asd (projname features)
-  (let ((deps
-          (if (has-feature :cmd features)
-              (cons :cmd +default-deps+)
-              +default-deps+)))
+  ;; FIXME: make this cleaner:
+  (let* ((deps
+           (if (has-feature :cmd features)
+               (cons :cmd +default-deps+)
+               +default-deps+))
+         (deps (if-not (has-feature :cl-oju features)
+                       (remove :cl-oju deps)
+                       deps)))
     (render-project-file projname
                          (str projname ".asd")
                          (format nil "(defsystem :PROJNAME
@@ -274,7 +287,6 @@ sbcl --non-interactive \\
   (add-makefile projname features)
   (add-build-sh projname)
   (add-test-sh projname)
-  ;; WIP: start adding deps as appropriate:
   (add-asd projname features)
   (when (or (has-feature :ci features)
             (has-feature :docker features))

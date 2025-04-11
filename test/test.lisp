@@ -64,12 +64,16 @@
                   (with-out-str
                     (steelcut::write-app "testingapp" steelcut::+default-features+)))))))
 
-(defmacro with-setup (d appsym appname &body body)
+(defmacro with-setup (d appsym appname features &body body)
   "Test harness providing temporary target directory"
-  `(let ((,appsym ,appname))
-     (with-temporary-dir (,d)
-       (with-testing-lisp-home ((namestring d))
-         ,@body))))
+  (let ((featuresym (gensym)))
+    `(let ((,appsym ,appname)
+           (,featuresym ,features))
+       (with-temporary-dir (,d)
+         (with-testing-lisp-home ((namestring d))
+           (no-output
+             (steelcut::write-app ,appsym ,featuresym))
+           ,@body)))))
 
 (defmacro no-output (&body body)
   `(with-out-str ,@body))
@@ -87,9 +91,7 @@
              (cons '(:a :c :e) '(:b :d)))))
 
 (test needed-files-created
-  (with-setup d appname "testingapp"
-    (no-output
-      (steelcut::write-app appname steelcut::+default-features+))
+  (with-setup d appname "testingapp" steelcut::+default-features+
     (loop for file in '("Makefile"
                         "Dockerfile"
                         ".github/workflows/build.yml"
@@ -106,24 +108,21 @@
 (defun has-cmd-example-p (source)
   (cl-ppcre:scan "(?i)\\(\\s*defun\\s+cmd-example\\b" source))
 
+(defun has-cl-oju-example-p (source)
+  (cl-ppcre:scan "(?i)\\(\\s*defun\\s+cl-oju-example\\b" source))
+
 (defun has-make-docker-target-p (source)
   (cl-ppcre:scan "(?i)docker:" source))
 
 (test deselecting-ci-feature-turns-off-github-action-file
-  (with-setup d appname "testingapp"
-    (no-output
-      (steelcut::write-app appname (remove :ci steelcut::+default-features+)))
+  (with-setup d appname "testingapp" (remove :ci steelcut::+default-features+)
     (let ((file ".github/workflows/build.yml")
           (appdir (merge-pathnames appname d)))
       (is (not (uiop:file-exists-p (steelcut::join/ appdir file)))))))
 
 (test deselecting-ci-and-docker-turns-off-docker
-  (with-setup d appname "testingapp"
-    (no-output
-      (steelcut::write-app
-       appname
-       (remove :ci
-               (remove :docker steelcut::+default-features+))))
+  (with-setup d appname "testingapp" (remove :ci
+                                             (remove :docker steelcut::+default-features+))
     (let* ((appdir (merge-pathnames appname d))
            (make-contents (slurp (steelcut::join/ appdir "Makefile"))))
       (is (not (uiop:file-exists-p (steelcut::join/ appdir "Dockerfile"))))
@@ -134,9 +133,7 @@
                       raw-asd)))
 
 (test cmd-feature-adds-dependency-and-example
-  (with-setup d appname "testingapp"
-    (no-output
-      (steelcut::write-app appname steelcut::+default-features+))
+  (with-setup d appname "testingapp" steelcut::+default-features+
     (let* ((appdir (merge-pathnames appname d))
            (deps
              (find-deps-in-asd-string
@@ -149,9 +146,7 @@
       (is (not (has-cmd-example-p main-text)))))
 
   ;; Add :cmd to features, should get the new dependency:
-  (with-setup d appname "test2"
-    (no-output
-      (steelcut::write-app appname (cons :cmd steelcut::+default-features+)))
+  (with-setup d appname "test2" (cons :cmd steelcut::+default-features+)
     (let* ((appdir (merge-pathnames appname d))
            (deps
              (find-deps-in-asd-string
@@ -162,3 +157,27 @@
       (is (find :cmd deps))
       ;; It contains the example function:
       (is (has-cmd-example-p main-text)))))
+
+(test cl-oju-feature
+  (with-setup d appname "testingapp" steelcut::+default-features+
+    (let* ((appdir (merge-pathnames appname d))
+           (deps
+             (find-deps-in-asd-string
+              (read-from-string
+               (slurp (steelcut::join/ appdir "testingapp.asd")))))
+           (main-text (slurp (steelcut::join/ appdir "src/main.lisp"))))
+      ;; :cl-oju is there:
+      (is (find :cl-oju deps))
+      ;; It contains the example function:
+      (is (has-cl-oju-example-p main-text))))
+  (with-setup d appname "testingapp" (remove :cl-oju steelcut::+default-features+)
+    (let* ((appdir (merge-pathnames appname d))
+           (deps
+             (find-deps-in-asd-string
+              (read-from-string
+               (slurp (steelcut::join/ appdir "testingapp.asd")))))
+           (main-text (slurp (steelcut::join/ appdir "src/main.lisp"))))
+      ;; :cl-oju is NOT there:
+      (is (not (find :cl-oju deps)))
+      ;; It contains the example function:
+      (is (not (has-cl-oju-example-p main-text))))))
