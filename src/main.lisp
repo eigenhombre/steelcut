@@ -5,8 +5,9 @@
 
 (defparameter +available-features+
   (append +default-features+
-          '(:csv
-            :cmd
+          '(:cmd
+            ;; Future:
+            :csv
             :json
             :time
             :webclient
@@ -156,10 +157,10 @@ jobs:
         run: make docker
 "))
 
-(defun add-makefile (projname)
+(defun add-makefile (projname features)
   (render-project-file projname
                        "Makefile"
-                       ".PHONY: clean install test
+                       (format nil ".PHONY: clean install test
 
 PROJNAME: src/*.lisp
 	./build.sh
@@ -170,13 +171,16 @@ test:
 clean:
 	rm -rf PROJNAME
 
-docker:
-	docker build -t PROJNAME .
-
-install: PROJNAME
+~ainstall: PROJNAME
 	test -n \"$(BINDIR)\"  # $$BINDIR
 	cp PROJNAME ${BINDIR}
-"))
+"  (if (or (has-feature :docker features)
+           (has-feature :ci features))
+       "docker:
+	docker build -t PROJNAME .
+
+"
+       ""))))
 
 (defun make-executable (path)
   (setf (attributes path) #o755))
@@ -262,7 +266,7 @@ sbcl --non-interactive \\
   (add-test-lisp projname)
   (add-main-package projname)
   (add-test-package projname)
-  (add-makefile projname)
+  (add-makefile projname features)
   (add-build-sh projname)
   (add-test-sh projname)
   ;; WIP: start adding deps as appropriate:

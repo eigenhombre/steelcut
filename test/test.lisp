@@ -74,6 +74,18 @@
 (defmacro no-output (&body body)
   `(with-out-str ,@body))
 
+(test parsing-arguments
+  (is (equal (steelcut::parse-args ())
+             (cons nil nil)))
+  (is (equal (steelcut::parse-args '("a"))
+             (cons '(:a) nil)))
+  (is (equal (steelcut::parse-args '("a" "-b"))
+             (cons '(:a) '(:b))))
+  (is (equal (steelcut::parse-args '("+a" "-b"))
+             (cons '(:a) '(:b))))
+  (is (equal (steelcut::parse-args '("+a" "-b" "c" "-d" "+e"))
+             (cons '(:a :c :e) '(:b :d)))))
+
 (test needed-files-created
   (with-setup d appname "testingapp"
     (no-output
@@ -91,6 +103,12 @@
              (let ((appdir (merge-pathnames appname d)))
                (is (uiop:file-exists-p (steelcut::join/ appdir file)))))))
 
+(defun has-cmd-example-p (source)
+  (cl-ppcre:scan "(?i)\\(\\s*defun\\s+cmd-example\\b" source))
+
+(defun has-make-docker-target-p (source)
+  (cl-ppcre:scan "(?i)docker:" source))
+
 (test deselecting-ci-feature-turns-off-github-action-file
   (with-setup d appname "testingapp"
     (no-output
@@ -99,12 +117,21 @@
           (appdir (merge-pathnames appname d)))
       (is (not (uiop:file-exists-p (steelcut::join/ appdir file)))))))
 
+(test deselecting-ci-and-docker-turns-off-docker
+  (with-setup d appname "testingapp"
+    (no-output
+      (steelcut::write-app
+       appname
+       (remove :ci
+               (remove :docker steelcut::+default-features+))))
+    (let* ((appdir (merge-pathnames appname d))
+           (make-contents (slurp (steelcut::join/ appdir "Makefile"))))
+      (is (not (uiop:file-exists-p (steelcut::join/ appdir "Dockerfile"))))
+      (is (not (has-make-docker-target-p make-contents))))))
+
 (defun find-deps-in-asd-string (raw-asd)
   (second (drop-while (lambda (x) (not (equal x :depends-on)))
                       raw-asd)))
-
-(defun has-cmd-example-p (source)
-  (cl-ppcre:scan "(?i)\\(\\s*defun\\s+cmd-example\\b" source))
 
 (test cmd-feature-adds-dependency-and-example
   (with-setup d appname "testingapp"
@@ -135,15 +162,3 @@
       (is (find :cmd deps))
       ;; It contains the example function:
       (is (has-cmd-example-p main-text)))))
-
-(test parsing-arguments
-  (is (equal (steelcut::parse-args ())
-             (cons nil nil)))
-  (is (equal (steelcut::parse-args '("a"))
-             (cons '(:a) nil)))
-  (is (equal (steelcut::parse-args '("a" "-b"))
-             (cons '(:a) '(:b))))
-  (is (equal (steelcut::parse-args '("+a" "-b"))
-             (cons '(:a) '(:b))))
-  (is (equal (steelcut::parse-args '("+a" "-b" "c" "-d" "+e"))
-             (cons '(:a :c :e) '(:b :d)))))
