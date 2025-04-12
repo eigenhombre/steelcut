@@ -18,7 +18,7 @@
   :description "FIXME"
   :author "FIXME"
   :license "FIXME"
-  :depends-on (:steelcut :1am)
+  :depends-on (:arrows :steelcut :1am)
   :serial t
   :components ((:module "test"
                 :serial t

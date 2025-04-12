@@ -79,7 +79,7 @@ PROJNAME
                                    "")
                                (if (has-feature :cl-oju features)
                                    "(defun cl-oju-example ()
-  (format t \"~a~%\" (cl-oju:take-while (cl-oju:partial #'< 5)
+  (format t \"~a~%\" (cl-oju:take-while (cl-oju:partial #'> 5)
                                         (cl-oju:range 10))))
 "
                                    "")

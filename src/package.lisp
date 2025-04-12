@@ -6,4 +6,9 @@
    :cl-oju
    :cl-ppcre
    :org.shirakumo.file-attributes)
-  (:export :main))
+  (:export
+   :main
+   :join/
+   :lisp-home
+   :write-app
+   :+default-features+))
