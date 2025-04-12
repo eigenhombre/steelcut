@@ -1,18 +1,20 @@
 (in-package #:steelcut)
 
 (defparameter +default-features+
-  '(:cli :ci :docker :cl-oju))
+  '(:ci :docker :cl-oju ;; :cli
+    ))
 
 (defparameter +available-features+
   (append +default-features+
           '(:cmd
             ;; Future:
-            :csv
-            :json
-            :time
-            :webclient
-            :webserver
-            :xml)))
+            ;; :csv
+            ;; :json
+            ;; :time
+            ;; :webclient
+            ;; :webserver
+            ;; :xml
+            )))
 
 (defun has-feature (feature-name features)
   (find feature-name features))
@@ -77,7 +79,8 @@ PROJNAME
                                    "")
                                (if (has-feature :cl-oju features)
                                    "(defun cl-oju-example ()
-  (format t \"~a~%\" (take-while (partial < 5) (range 10)))
+  (format t \"~a~%\" (cl-oju:take-while (cl-oju:partial #'< 5)
+                                        (cl-oju:range 10))))
 "
                                    "")
                                (if (has-feature :cmd features)
