@@ -101,7 +101,7 @@
 
   Example usage:
     (with-setup app \"demo\" appdir deps +default-features+
-      (is (uiop:file-exists-p (join/ appdir \"Makefile\"))))
+      (is (find :cl-oju (deps))))
 
     ;; If deps is unused, pass _ to skip the binding and suppress compiler warnings:
     (with-setup app \"demo\" appdir _ +default-features+
