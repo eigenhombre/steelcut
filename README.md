@@ -128,7 +128,7 @@ This is a work in progress.  The following features are implemented:
 
 Planned additional selectable features:
 
-    :csv         :json        :time
+    :csv         :json        :time     :yaml
     :webclient   :webserver   :xml
 
 # License
