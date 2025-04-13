@@ -108,21 +108,23 @@ defaults.  Examples:
 
 Select library only with no other defaults:
 
-    $ steelcut myapp +lib -ci -docker -cl-oju
+    $ steelcut myapp -ci -docker -cl-oju
 
 Build a Web service app which accepts JSON requests:
 
-    $ steelcut myapp +app +webserver +json
+    $ steelcut myapp +webserver +json
 
 `+` selects an option, and is optional. `-` deselects a (presumably default)
 option.
 
 This is a work in progress.  The following features are implemented:
 
-- docker (enabled by default)
-- CI (enabled by default)
+- `docker` (enabled by default)
+- CI GitHub Actions build (enabled by default; implies `docker`)
 - `cmd` (uses [Paul Rodriguez's library](https://github.com/ruricolist/cmd);
   disabled by default.
+- `arg` argument processing via [Adopt](https://github.com/sjl/adopt/)
+  (in progress)
 
 # License
 

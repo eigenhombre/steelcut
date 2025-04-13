@@ -101,7 +101,7 @@
 
   Example usage:
     (with-setup app \"demo\" appdir deps +default-features+
-      (is (find :cl-oju (deps))))
+      (is (member :cl-oju (deps))))
 
     ;; If deps is unused, pass _ to skip the binding and suppress compiler warnings:
     (with-setup app \"demo\" appdir _ +default-features+
@@ -175,7 +175,7 @@
   (with-setup appname "testingapp" appdir deps +default-features+
     (let ((main-text (slurp (join/ appdir "src/main.lisp"))))
       ;; :cmd is not there:
-      (is (not (find :cmd (deps))))
+      (is (not (member :cmd (deps))))
       ;; It doesn't contain the example function:
       (is (not (has-cmd-example-p main-text)))))
 
@@ -183,20 +183,36 @@
   (with-setup appname "test2" appdir deps (cons :cmd +default-features+)
     (let ((main-text (slurp (join/ appdir "src/main.lisp"))))
       ;; :cmd is now there:
-      (is (find :cmd (deps)))
+      (is (member :cmd (deps)))
       ;; It contains the example function:
       (is (has-cmd-example-p main-text)))))
 
 (test cl-oju-feature
-  (with-setup appname "testingapp" appdir deps +default-features+
+  (with-setup appname "testingapp" appdir deps (cons :cl-oju +default-features+)
     (let ((main-text (slurp (join/ appdir "src/main.lisp"))))
       ;; :cl-oju is there:
-      (is (find :cl-oju (deps)))
+      (is (member :cl-oju (deps)))
       ;; It contains the example function:
       (is (has-cl-oju-example-p main-text))))
   (with-setup appname "testingapp" appdir deps (remove :cl-oju +default-features+)
     (let ((main-text (slurp (join/ appdir "src/main.lisp"))))
       ;; :cl-oju is NOT there:
-      (is (not (find :cl-oju (deps))))
+      (is (not (member :cl-oju (deps))))
       ;; It contains the example function:
       (is (not (has-cl-oju-example-p main-text))))))
+
+(test args-feature
+  (with-setup appname "testingapp" appdir deps (remove :args +default-features+)
+    (let ((main-text (slurp (join/ appdir "src/main.lisp"))))
+      ;; :adopt is NOT there:
+      (is (not (member :adopt (deps))))
+      ;; It contains the example function:
+      ;; TODO
+      ))
+  (with-setup appname "testingapp" appdir deps (cons :args +default-features+)
+    (let ((main-text (slurp (join/ appdir "src/main.lisp"))))
+      ;; :adopt is NOT there:
+      (is (member :adopt (deps)))
+      ;; It contains the example function:
+      ;; TODO
+      )))

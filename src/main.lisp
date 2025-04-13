@@ -1,12 +1,12 @@
 (in-package #:steelcut)
 
 (defparameter +default-features+
-  '(:ci :docker :cl-oju ;; :cli
-    ))
+  '(:ci :docker :cl-oju))
 
 (defparameter +available-features+
   (append +default-features+
           '(:cmd
+            :args
             ;; Future:
             ;; :csv
             ;; :json
@@ -243,18 +243,25 @@ sbcl --non-interactive \\
 
 (defparameter +default-deps+ (list :arrows :cl-oju))
 
+(defun maybe-remove-feature (features dep feat deps)
+  (if-not (has-feature feat features)
+          (remove dep deps)
+          deps))
+
+(defun maybe-add-feature (features dep feat deps)
+  (if (has-feature feat features)
+      (cons dep deps)
+      deps))
+
+(defun check-feature (features dep feat deps)
+  (->> deps
+       (maybe-remove-feature features dep feat)
+       (maybe-add-feature features dep feat)))
+
 (defun add-asd (projname features)
-  ;; FIXME: make this cleaner:
-  (let* ((deps
-           (if (has-feature :cmd features)
-               (cons :cmd +default-deps+)
-               +default-deps+))
-         (deps (if-not (has-feature :cl-oju features)
-                       (remove :cl-oju deps)
-                       deps)))
-    (render-project-file projname
-                         (str projname ".asd")
-                         (format nil "(defsystem :PROJNAME
+  (render-project-file projname
+                       (str projname ".asd")
+                       (format nil "(defsystem :PROJNAME
   :description \"FIXME\"
   :author \"FIXME\"
   :license \"FIXME\"
@@ -278,7 +285,10 @@ sbcl --non-interactive \\
                              (:file \"test\"))))
   :perform (asdf:test-op (op system)
                          (funcall (read-from-string \"PROJNAME.test:run-tests\"))))
-" deps))))
+" (->> +default-deps+
+       (check-feature features :cmd :cmd)
+       (check-feature features :adopt :args)
+       (check-feature features :cl-oju :cl-oju)))))
 
 (defun make-project (projname features)
   (ensure-directories-exist (str (project-path projname) "/"))
