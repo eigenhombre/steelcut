@@ -62,35 +62,92 @@
 PROJNAME
 "))
 
+
+(defparameter *adopt-setup*
+  "
+;; Example adapted from https://docs.stevelosh.com/adopt/usage/...
+;; See that reference for more details on using Adopt.
+(defparameter *ui*
+  (adopt:make-interface
+   :name \"PROJNAME\"
+   :summary \"Do PROJNAME stuff....\"
+   :usage \"[OPTIONS]...\"
+   :help \"PROJNAME is a program that (...describe me...).\"
+   :contents (list
+              (adopt:make-option 'version
+                                 :long \"version\"
+                                 :short #\\V
+                                 :help \"Display version and exit.\"
+                                 :reduce (constantly t))
+              (adopt:make-option 'help
+                                 :long \"help\"
+                                 :short #\\h
+                                 :help \"Display help and exit.\"
+                                 :reduce (constantly t)))))
+
+")
+
+(defun adopt-main-fmt (&rest feature-fn-strings)
+  (format nil "(defun run (arguments options)
+~{~a~}  (format t \"Thanks for using PROJNAME!~~%\"))
+
+(defun main ()
+  (handler-case
+      (multiple-value-bind (arguments options) (adopt:parse-options *ui*)
+        (when (gethash 'help options)
+          (adopt:print-help-and-exit *ui*))
+        (when (gethash 'version options)
+          (format t \"0.0.1~~%\")
+          (adopt:exit))
+        (run arguments options))
+    (error (c)
+      (adopt:print-error-and-exit c))))
+" feature-fn-strings))
+
+;; The default main, if not using Adopt (:args Steelcut option):
+(defun main-fmt (&rest feature-fn-strings)
+  (format nil "(defun main ()
+~{~a~}  (format t \"Thanks for using PROJNAME!~~%\"))
+" feature-fn-strings))
+
+(comment
+  (adopt-main-fmt "  (a-form)
+" "  3
+" "  (z-form
+    (inner))
+"))
+
+(defmacro str-when (pred s)
+  `(if ,pred
+       (concatenate 'string ,s (string #\Newline))
+       ""))
+
 (defun add-main-lisp (projname features)
   (render-project-file projname
                        "src/main.lisp"
                        (format nil
                                "(in-package #:PROJNAME)
 
-~a~a
-(defun main ()
-~a~a  (format t \"Thanks for using PROJNAME!~~%\"))
-"
-                               (if (has-feature :cmd features)
-                                   "(defun cmd-example ()
-  (format t \"~a~%\" (cmd:$cmd \"ls\")))
-"
-                                   "")
-                               (if (has-feature :cl-oju features)
-                                   "(defun cl-oju-example ()
+~a~a~a~a~a"
+                               (str-when (has-feature :cmd features)
+                                         "(defun cmd-example ()
+  (format t \"~a~%\" (cmd:$cmd \"ls\"))) ")
+                               (str-when (has-feature :cl-oju features)
+                                         "(defun cl-oju-example ()
   (format t \"~a~%\" (cl-oju:take-while (cl-oju:partial #'> 5)
-                                        (cl-oju:range 10))))
-"
-                                   "")
-                               (if (has-feature :cmd features)
-                                   "  (cmd-example)
-"
-                                   "")
-                               (if (has-feature :cl-oju features)
-                                   "  (cl-oju-example)
-"
-                                   ""))))
+                                        (cl-oju:range 10)))) ")
+                               (str-when (has-feature :cmd features)
+                                         "  (cmd-example) ")
+                               (str-when (has-feature :args features)
+                                         *adopt-setup*)
+                               ;; Apply either Adopt-style or vanilla main:
+                               (funcall (if (has-feature :args features)
+                                            #'adopt-main-fmt
+                                            #'main-fmt)
+                                        (str-when (has-feature :cmd features)
+                                                  "  (cmd-example)")
+                                        (str-when (has-feature :cl-oju features)
+                                                  "  (cl-oju-example)")))))
 
 (defun add-main-package (projname)
   (render-project-file projname

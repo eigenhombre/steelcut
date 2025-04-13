@@ -112,7 +112,7 @@ Select library only with no other defaults:
 
 Build a Web service app which accepts JSON requests:
 
-    $ steelcut myapp +webserver +json
+    $ steelcut myapp +webserver +json +args
 
 `+` selects an option, and is optional. `-` deselects a (presumably default)
 option.
@@ -123,8 +123,13 @@ This is a work in progress.  The following features are implemented:
 - CI GitHub Actions build (enabled by default; implies `docker`)
 - `cmd` (uses [Paul Rodriguez's library](https://github.com/ruricolist/cmd);
   disabled by default.
-- `arg` argument processing via [Adopt](https://github.com/sjl/adopt/)
+- `args`: argument processing via Steve Losh's [Adopt](https://github.com/sjl/adopt/)
   (in progress)
+
+Planned additional selectable features:
+
+    :csv         :json        :time
+    :webclient   :webserver   :xml
 
 # License
 

@@ -138,6 +138,9 @@
 (defun has-cl-oju-example-p (source)
   (cl-ppcre:scan "(?i)\\(\\s*defun\\s+cl-oju-example\\b" source))
 
+(defun has-adopt-example-p (source)
+  (cl-ppcre:scan "(?i)adopt\:print-help-and-exit\\b" source))
+
 (defun has-make-docker-target-p (source)
   (cl-ppcre:scan "(?i)docker:" source))
 
@@ -198,7 +201,7 @@
     (let ((main-text (slurp (join/ appdir "src/main.lisp"))))
       ;; :cl-oju is NOT there:
       (is (not (member :cl-oju (deps))))
-      ;; It contains the example function:
+      ;; It does NOT contain the example function:
       (is (not (has-cl-oju-example-p main-text))))))
 
 (test args-feature
@@ -207,12 +210,10 @@
       ;; :adopt is NOT there:
       (is (not (member :adopt (deps))))
       ;; It contains the example function:
-      ;; TODO
-      ))
+      (is (not (has-adopt-example-p main-text)))))
   (with-setup appname "testingapp" appdir deps (cons :args +default-features+)
     (let ((main-text (slurp (join/ appdir "src/main.lisp"))))
       ;; :adopt is NOT there:
       (is (member :adopt (deps)))
       ;; It contains the example function:
-      ;; TODO
-      )))
+      (is (has-adopt-example-p main-text)))))
