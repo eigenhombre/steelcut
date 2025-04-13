@@ -134,8 +134,9 @@ PROJNAME
   (format t \"~a~%\" (cmd:$cmd \"ls\"))) ")
                                (str-when (has-feature :cl-oju features)
                                          "(defun cl-oju-example ()
-  (format t \"~a~%\" (cl-oju:take-while (cl-oju:partial #'> 5)
-                                        (cl-oju:range 10)))) ")
+  (println (->> (range 10)
+                (take-while (partial #'> 5))
+                (drop 2))))")
                                (str-when (has-feature :cmd features)
                                          "  (cmd-example) ")
                                (str-when (has-feature :args features)
@@ -149,13 +150,17 @@ PROJNAME
                                         (str-when (has-feature :cl-oju features)
                                                   "  (cl-oju-example)")))))
 
-(defun add-main-package (projname)
+(defun add-main-package (projname features)
   (render-project-file projname
                        "src/package.lisp"
-                       "(defpackage PROJNAME
-  (:use :cl :arrows)
+                       (format nil "(defpackage PROJNAME
+  (:use ~{~S~^ ~})
   (:export :main))
-"))
+"
+                               (->> features
+                                    deps-for-features
+                                    (remove :adopt)
+                                    (cons :cl)))))
 
 (defun add-test-lisp (projname)
   (render-project-file projname
@@ -298,22 +303,15 @@ sbcl --non-interactive \\
 ")
   (make-executable (join/ (project-path projname) "test.sh")))
 
-(defparameter +default-deps+ (list :arrows :cl-oju))
-
-(defun maybe-remove-feature (features dep feat deps)
-  (if-not (has-feature feat features)
-          (remove dep deps)
-          deps))
-
-(defun maybe-add-feature (features dep feat deps)
-  (if (has-feature feat features)
-      (cons dep deps)
-      deps))
-
-(defun check-feature (features dep feat deps)
-  (->> deps
-       (maybe-remove-feature features dep feat)
-       (maybe-add-feature features dep feat)))
+(defun deps-for-features (features)
+  (loop for f in features
+        for deps = (case f
+                     (:args (list :adopt))
+                     (:cl-oju (list :arrows :cl-oju))
+                     (:cmd (list :cmd))
+                     ;; Docker/CI do not add CL deps.
+                     )
+        append deps))
 
 (defun add-asd (projname features)
   (render-project-file projname
@@ -342,17 +340,14 @@ sbcl --non-interactive \\
                              (:file \"test\"))))
   :perform (asdf:test-op (op system)
                          (funcall (read-from-string \"PROJNAME.test:run-tests\"))))
-" (->> +default-deps+
-       (check-feature features :cmd :cmd)
-       (check-feature features :adopt :args)
-       (check-feature features :cl-oju :cl-oju)))))
+" (deps-for-features features))))
 
 (defun make-project (projname features)
   (ensure-directories-exist (str (project-path projname) "/"))
   (add-gitignore projname)
   (add-main-lisp projname features)
   (add-test-lisp projname)
-  (add-main-package projname)
+  (add-main-package projname features)
   (add-test-package projname)
   (add-makefile projname features)
   (add-build-sh projname)

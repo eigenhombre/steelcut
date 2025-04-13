@@ -193,14 +193,17 @@
 (test cl-oju-feature
   (with-setup appname "testingapp" appdir deps (cons :cl-oju +default-features+)
     (let ((main-text (slurp (join/ appdir "src/main.lisp"))))
-      ;; :cl-oju is there:
+      ;; :cl-oju and :arrows are dependencies:
       (is (member :cl-oju (deps)))
+      (is (member :arrows (deps)))
       ;; It contains the example function:
       (is (has-cl-oju-example-p main-text))))
   (with-setup appname "testingapp" appdir deps (remove :cl-oju +default-features+)
     (let ((main-text (slurp (join/ appdir "src/main.lisp"))))
       ;; :cl-oju is NOT there:
       (is (not (member :cl-oju (deps))))
+      ;; :arrows is NOT there:
+      ;; (is (not (member :arrows (deps))))
       ;; It does NOT contain the example function:
       (is (not (has-cl-oju-example-p main-text))))))
 
