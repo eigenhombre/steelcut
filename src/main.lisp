@@ -64,8 +64,7 @@ PROJNAME
 
 
 (defparameter *adopt-setup*
-  "
-;; Example adapted from https://docs.stevelosh.com/adopt/usage/...
+  ";; Example adapted from https://docs.stevelosh.com/adopt/usage/...
 ;; See that reference for more details on using Adopt.
 (defparameter *ui*
   (adopt:make-interface
