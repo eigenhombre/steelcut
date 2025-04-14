@@ -1,0 +1,53 @@
+#!/bin/bash
+# Test all feature permutations from
+# the set:
+#
+#   ci docker cmd cl-oju args
+# Test:
+# - single features
+# - all pairs of features
+
+set -e
+
+# Requires $BINDIR and $LISP_HOME to be set:
+if [ -z "$BINDIR" ]; then
+  echo "Please set BINDIR to the directory containing the features"
+  exit 1
+fi
+if [ -z "$LISP_HOME" ]; then
+  echo "Please set LISP_HOME to the directory containing local projects."
+  exit 1
+fi
+
+FEATURES=(
+  ci
+  docker
+  cmd
+  cl-oju
+  args
+)
+
+# Function to run the test
+run_test() {
+  local feat_comb=("$@")
+  local proj_suffix
+  proj_suffix=$(IFS=- ; echo "${feat_comb[*]}")
+  local proj_name="example-${proj_suffix}"
+
+  echo "Testing features: ${feat_comb[*]}"
+  "$BINDIR/steelcut" "$proj_name" $(printf ' +%s' "${feat_comb[@]}")
+  cd "$LISP_HOME/$proj_name"
+  make && make test && make install && $BINDIR/$proj_name
+}
+
+# Test all single features
+for f in "${FEATURES[@]}"; do
+  run_test "$f"
+done
+
+# Test all unique pairs of features
+for ((i = 0; i < ${#FEATURES[@]}; i++)); do
+  for ((j = i + 1; j < ${#FEATURES[@]}; j++)); do
+    run_test "${FEATURES[i]}" "${FEATURES[j]}"
+  done
+done

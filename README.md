@@ -10,22 +10,26 @@ project generator.
 
 # Features
 
-This program provides a simple template for new Common Lisp projects,
-including:
+The program generates new Common Lisp projects.  The idea is to make it
+as easy as possible to generate, test, build and install a new Common Lisp
+program as easily as possible.
+
 - Projects can be generated and built using
   [SBCL](https://en.wikipedia.org/wiki/Steel_Bank_Common_Lisp), a
   free, fast and multi-platform Lisp system
+- Generated projects have selectable features as outlined in Feature
+  Selection, below
 - Build stand-alone binaries for the current architecture with one
   command (`make`)
-- Install on current path (`make install`)
-- Run unit tests for current project (`make test`)
+- Install using `make install`
+- Run unit tests for current project `make test`
 - Run tests and build sample project within Docker (`make docker`)
   - Do the above in the GitHub Actions CI system (see generated
     `build.yml`)
 
 # Status
 
-Very very alpha.  I'm using it, probably nobody else is.
+Pretty alpha.  I'm using it, probably nobody else is.
 
 Tested only on `(and SBCL (or (Mac M1) (and Docker Ubuntu))))`.
 
@@ -130,6 +134,15 @@ Planned additional selectable features:
 
     :csv         :json        :time     :yaml
     :webclient   :webserver   :xml
+
+# Testing Steelcut
+
+There are several unit tests which rely on generating example projects
+in temporary directories and checking properties of the resulting
+files.  =make docker= runs a test script =test-all-features= which
+generates and tests all single and double combinations of features.
+**This is best run in Docker** to avoid polluting your =$LISP_HOME=
+with lots of temporary projects.
 
 # License
 

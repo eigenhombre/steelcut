@@ -33,8 +33,5 @@ RUN make clean test
 RUN make
 RUN mkdir /home/janice/bin
 RUN make install
-RUN $BINDIR/steelcut foo
-WORKDIR /home/janice/quicklisp/local-projects/foo
-RUN make
-RUN make install
-RUN $BINDIR/foo
+COPY test-all-features /home/janice/steelcut
+RUN ./test-all-features
