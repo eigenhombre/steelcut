@@ -122,12 +122,31 @@ option.  (`Webserver` and `json` are not yet implemented.)
 
 This is a work in progress.  The following features are implemented:
 
-- `docker` (enabled by default)
-- CI GitHub Actions build (enabled by default; implies `docker`)
-- `cmd` (uses [Paul Rodriguez's library](https://github.com/ruricolist/cmd);
-  disabled by default.
-- `args`: argument processing via Steve Losh's [Adopt](https://github.com/sjl/adopt/)
-  (in progress)
+** `docker` (enabled by default)
+
+A Dockerfile is generated, and the project can be built, tested and run
+in Docker with the `make docker` command.
+
+** `ci` (enabled by default; implies `docker`)
+
+A GitHub Actions build file is generated, which runs `make docker`.
+
+** `cl-oju` (enabled by default)
+
+Brings in [`cl-oju`](https://github.com/eigenhombre/cl-oju), a simple
+compatibility library providing Common Lisp equivalent of several core
+Clojure functions.
+
+** `cmd` (disabled by default)
+
+Uses [Paul Rodriguez's library](https://github.com/ruricolist/cmd) for
+interacting with the shell.
+
+** `args` (disabled by default)
+
+Provides argument processing via Steve Losh's [Adopt](https://github.com/sjl/adopt/).
+
+Each option provides necessary dependencies and an example of usage.
 
 Planned additional selectable features:
 
