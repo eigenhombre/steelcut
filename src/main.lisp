@@ -122,23 +122,29 @@ PROJNAME
        (concatenate 'string ,s (string #\Newline))
        ""))
 
+(defun cmd-example ()
+  "(defun cmd-example ()
+  (format t \"~a~%\" (cmd:$cmd \"ls\")))
+")
+
+(defun cl-oju-example ()
+  "(defun cl-oju-example ()
+  (println (->> (range 10)
+                (take-while (partial #'> 5))
+                (drop 2))))
+")
+
 (defun add-main-lisp (projname features)
   (render-project-file projname
                        "src/main.lisp"
                        (format nil
                                "(in-package #:PROJNAME)
 
-~a~a~a~a~a"
+~a~a~a~a"
                                (str-when (has-feature :cmd features)
-                                         "(defun cmd-example ()
-  (format t \"~a~%\" (cmd:$cmd \"ls\"))) ")
+                                         (cmd-example))
                                (str-when (has-feature :cl-oju features)
-                                         "(defun cl-oju-example ()
-  (println (->> (range 10)
-                (take-while (partial #'> 5))
-                (drop 2))))")
-                               (str-when (has-feature :cmd features)
-                                         "  (cmd-example) ")
+                                         (cl-oju-example))
                                (str-when (has-feature :args features)
                                          *adopt-setup*)
                                ;; Apply either Adopt-style or vanilla main:
