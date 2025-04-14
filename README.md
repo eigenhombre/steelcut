@@ -109,7 +109,7 @@ Assuming you want to call your new project `myproject`:
 Some features in generated projects are optional, with de-selectable
 defaults.  Examples:
 
-Select library only with no other defaults:
+Generate vanilla app only with no extra dependencies:
 
     $ steelcut myapp -ci -docker -cl-oju
 
@@ -118,7 +118,7 @@ Build a Web service app which accepts JSON requests:
     $ steelcut myapp +webserver +json +args
 
 `+` selects an option, and is optional. `-` deselects a (presumably default)
-option.
+option.  (`Webserver` and `json` are not yet implemented.)
 
 This is a work in progress.  The following features are implemented:
 
@@ -138,9 +138,9 @@ Planned additional selectable features:
 
 There are several unit tests which rely on generating example projects
 in temporary directories and checking properties of the resulting
-files.  =make docker= runs a test script =test-all-features= which
+files.  `make docker` runs a test script `test-all-features` which
 generates and tests all single and double combinations of features.
-**This is best run in Docker** to avoid polluting your =$LISP_HOME=
+**This is best run in Docker** to avoid polluting your `$LISP_HOME`
 with lots of temporary projects.
 
 # License
