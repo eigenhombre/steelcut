@@ -135,7 +135,7 @@ A GitHub Actions build file is generated, which runs `make docker`.
 ### `cl-oju` (enabled by default)
 
 Brings in [`cl-oju`](https://github.com/eigenhombre/cl-oju), a simple
-compatibility library providing Common Lisp equivalent of several core
+compatibility library providing Common Lisp equivalents of several core
 Clojure functions.
 
 ### `cmd` (disabled by default)
