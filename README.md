@@ -106,21 +106,22 @@ Assuming you want to call your new project `myproject`:
 
 ## Feature Selection
 
-Some features in generated projects are optional, with de-selectable
-defaults.  Examples:
+Some features in generated projects are optional, and the default
+features can be turned off.  Examples:
 
 Generate vanilla app only with no extra dependencies:
 
     $ steelcut myapp -ci -docker -cl-oju
 
-Build a Web service app which accepts JSON requests (in progress):
+Generate an app which takes command line arguments and can invoke
+shell commands:
 
-    $ steelcut myapp +webserver +json +args
+    $ steelcut myapp +cmd +args
 
 `+` selects an option, and is optional. `-` deselects a (presumably default)
-option.  (`Webserver` and `json` are not yet implemented.)
+option.
 
-This is a work in progress.  The following features are implemented:
+The following features are implemented, with more planned:
 
 ### `docker` (enabled by default)
 
@@ -150,7 +151,7 @@ Provides argument processing via Steve Losh's [Adopt](https://github.com/sjl/ado
 
 YAML parsing and generation by Fernando Borretti's
 [cl-yaml](https://github.com/eudoxia0/cl-yaml/).
-(NOTE: you must have `libyaml-dev` installed for this to work!
+(NOTE: you must have `libyaml-dev` installed for this to work!)
 
 Each option provides necessary dependencies and an example of usage.
 
