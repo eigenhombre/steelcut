@@ -12,7 +12,7 @@ project generator.
 
 The program generates new Common Lisp projects.  The idea is to make it
 as easy as possible to generate, test, build and install a new Common Lisp
-program as easily as possible.
+program.
 
 - Projects can be generated and built using
   [SBCL](https://en.wikipedia.org/wiki/Steel_Bank_Common_Lisp), a
