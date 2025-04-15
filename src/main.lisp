@@ -7,6 +7,7 @@
   (append +default-features+
           '(:cmd
             :args
+            :yaml
             ;; Future:
             ;; :csv
             ;; :json
@@ -133,27 +134,44 @@ PROJNAME
                 (drop 2))))
 ")
 
+(defun yaml-example ()
+  "(defun yaml-example ()
+  (format t \"~a~%\" (yaml:parse \"[1, 2, 3]\"))
+  ;;=>
+  ;; (1 2 3)
+  (format t \"~a~%\" (yaml:emit-to-string (list 1 2 3)))
+  ;;=>
+  ;; \"[1, 2, 3]\"
+  ;; (yaml:emit (list t 123 3.14) *standard-output*)
+  ;; ...
+)
+")
+
 (defun add-main-lisp (projname features)
   (render-project-file projname
                        "src/main.lisp"
-                       (format nil
-                               "(in-package #:PROJNAME)
+                       (concatenate 'string
+                                    "(in-package #:PROJNAME)
 
-~a~a~a~a"
-                               (str-when (has-feature :cmd features)
-                                         (cmd-example))
-                               (str-when (has-feature :cl-oju features)
-                                         (cl-oju-example))
-                               (str-when (has-feature :args features)
-                                         *adopt-setup*)
-                               ;; Apply either Adopt-style or vanilla main:
-                               (funcall (if (has-feature :args features)
-                                            #'adopt-main-fmt
-                                            #'main-fmt)
-                                        (str-when (has-feature :cmd features)
-                                                  "  (cmd-example)")
-                                        (str-when (has-feature :cl-oju features)
-                                                  "  (cl-oju-example)")))))
+"
+                                    (str-when (has-feature :cmd features)
+                                              (cmd-example))
+                                    (str-when (has-feature :cl-oju features)
+                                              (cl-oju-example))
+                                    (str-when (has-feature :yaml features)
+                                              (yaml-example))
+                                    (str-when (has-feature :args features)
+                                              *adopt-setup*)
+                                    ;; Apply either Adopt-style or vanilla main:
+                                    (funcall (if (has-feature :args features)
+                                                 #'adopt-main-fmt
+                                                 #'main-fmt)
+                                             (str-when (has-feature :cmd features)
+                                                       "  (cmd-example)")
+                                             (str-when (has-feature :cl-oju features)
+                                                       "  (cl-oju-example)")
+                                             (str-when (has-feature :yaml features)
+                                                       "  (yaml-example)")))))
 
 (defun add-main-package (projname features)
   (render-project-file projname
@@ -313,6 +331,7 @@ sbcl --non-interactive \\
         for deps = (case f
                      (:args (list :adopt))
                      (:cl-oju (list :arrows :cl-oju))
+                     (:yaml (list :cl-yaml))
                      (:cmd (list :cmd))
                      ;; Docker/CI do not add CL deps.
                      )

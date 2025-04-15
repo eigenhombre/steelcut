@@ -3,7 +3,7 @@ FROM ubuntu
 RUN apt-get -qq -y update
 RUN apt-get -qq -y upgrade
 
-RUN apt-get install -qq -y sbcl make curl git ecl
+RUN apt-get install -qq -y sbcl make curl git ecl libyaml-dev
 
 # Pull down Quicklisp and install it
 RUN curl -s -o quicklisp.lisp http://beta.quicklisp.org/quicklisp.lisp

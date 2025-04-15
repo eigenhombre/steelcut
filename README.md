@@ -113,7 +113,7 @@ Generate vanilla app only with no extra dependencies:
 
     $ steelcut myapp -ci -docker -cl-oju
 
-Build a Web service app which accepts JSON requests:
+Build a Web service app which accepts JSON requests (in progress):
 
     $ steelcut myapp +webserver +json +args
 
@@ -146,11 +146,17 @@ interacting with the shell.
 
 Provides argument processing via Steve Losh's [Adopt](https://github.com/sjl/adopt/).
 
+### `yaml` (disabled by default)
+
+YAML parsing and generation by Fernando Borretti's
+[cl-yaml](https://github.com/eudoxia0/cl-yaml/).
+(NOTE: you must have `libyaml-dev` installed for this to work!
+
 Each option provides necessary dependencies and an example of usage.
 
 Planned additional selectable features:
 
-    :csv         :json        :time     :yaml
+    :csv         :json        :time
     :webclient   :webserver   :xml
 
 # Testing Steelcut

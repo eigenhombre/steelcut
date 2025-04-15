@@ -20,11 +20,12 @@ if [ -z "$LISP_HOME" ]; then
 fi
 
 FEATURES=(
-  ci
-  docker
-  cmd
-  cl-oju
   args
+  ci
+  cl-oju
+  cmd
+  docker
+  yaml
 )
 
 # Function to run the test

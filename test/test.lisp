@@ -144,6 +144,9 @@
 (defun has-make-docker-target-p (source)
   (cl-ppcre:scan "(?i)docker:" source))
 
+(defun has-yaml-example-p (source)
+  (cl-ppcre:scan "(?i)\\(\\s*defun\\s+yaml-example\\b" source))
+
 (test needed-files-created
   (with-setup appname "testingapp" appdir _ +default-features+
     (loop for file in '("Makefile"
@@ -220,3 +223,18 @@
       (is (member :adopt (deps)))
       ;; It contains the example function:
       (is (has-adopt-example-p main-text)))))
+
+
+(test yaml-feature
+  (with-setup appname "testingapp" appdir deps (remove :yaml +default-features+)
+    (let ((main-text (slurp (join/ appdir "src/main.lisp"))))
+      ;; :cl-yaml is NOT there:
+      (is (not (member :cl-yaml (deps))))
+      ;; It contains the example function:
+      (is (not (has-yaml-example-p main-text)))))
+  (with-setup appname "testingapp" appdir deps (cons :yaml +default-features+)
+    (let ((main-text (slurp (join/ appdir "src/main.lisp"))))
+      ;; :cl-yaml IS there:
+      (is (member :cl-yaml (deps)))
+      ;; It contains the example function:
+      (is (has-yaml-example-p main-text)))))
