@@ -17,7 +17,7 @@ program.
 - Projects can be generated and built using
   [SBCL](https://en.wikipedia.org/wiki/Steel_Bank_Common_Lisp), a
     free, fast and multi-platform Lisp system
-  - Generated projects have selectable features as outlined in [Feature Selection](#feature-selection), below
+- Generated projects have selectable features as outlined in [Feature Selection](#feature-selection), below
 - Build stand-alone binaries for the current architecture with one
   command (`make`)
 - Install using `make install`
