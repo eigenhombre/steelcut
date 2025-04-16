@@ -28,7 +28,6 @@ FEATURES=(
   yaml
 )
 
-# Function to run the test
 run_test() {
   local feat_comb=("$@")
   local proj_suffix

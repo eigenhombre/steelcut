@@ -121,7 +121,7 @@
              ,@(if (eq depssym '_)
                    ;; skip defining deps function entirely
                    `((no-output
-                       (write-app ,appsym ,featuresym))
+                       (assert (= 0 (write-app ,appsym ,featuresym))))
                      ,@body)
                    ;; include deps function
                    `((labels ((,depssym ()
@@ -129,7 +129,7 @@
                                  (read-from-string
                                   (slurp (join/ ,appdirsym (str ,appsym ".asd")))))))
                        (no-output
-                         (write-app ,appsym ,featuresym))
+                         (assert (= 0 (write-app ,appsym ,featuresym))))
                        ,@body)))))))))
 
 (defun has-cmd-example-p (source)
@@ -146,6 +146,14 @@
 
 (defun has-yaml-example-p (source)
   (cl-ppcre:scan "(?i)\\(\\s*defun\\s+yaml-example\\b" source))
+
+(test cannot-create-project-whose-name-is-a-feature-name
+  (loop for feat in +default-features+
+        do (with-temporary-dir (d)
+             (with-testing-lisp-home ((namestring d))
+               (no-output
+                 (is (not= 0 (write-app (string-downcase (symbol-name feat))
+                                        +default-features+))))))))
 
 (test needed-files-created
   (with-setup appname "testingapp" appdir _ +default-features+

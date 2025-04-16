@@ -124,7 +124,7 @@ PROJNAME
 
 (defun cmd-example ()
   "(defun cmd-example ()
-  (format t \"~a~%\" (cmd:$cmd \"ls\")))
+  (format t \"~a~%\" ($cmd \"ls\")))
 ")
 
 (defun cl-oju-example ()
@@ -427,20 +427,31 @@ The default features are: ~a
           (feature-list-string +available-features+)
           (feature-list-string +default-features+)))
 
+(defun string-matches-keywords-p (str keywords)
+  (some (lambda (kw) (string= (string-upcase str) (symbol-name kw)))
+        keywords))
+
 (defun write-app (appname features)
   (cond
     ((not appname)
-     (format t "~a~%"(usage)))
+     (format t "~a~%"(usage))
+     0)
 
     ((find-project appname)
-     (format t "Project ~a already exists!~%" appname))
+     (format t "Project ~a already exists!~%" appname)
+     1)
+
+    ((string-matches-keywords-p appname +available-features+)
+     (format t "'~a' is a feature, not allowed as app name!~%" appname)
+     1)
 
     (t (progn
          (make-project appname features)
          (format t
                  "Project ~a created (features: ~a).  Thanks for using steelcut!~%"
                  appname
-                 (feature-list-string features))))))
+                 (feature-list-string features))
+         0))))
 
 ;; CLI argument parsing:
 (defun starts-with (s c)
@@ -517,4 +528,4 @@ The default features are: ~a
          (features (select-args (parse-args (cddr args)))))
     (if (find "-h" args :test #'equal)
         (println (usage))
-        (write-app appname features))))
+        (uiop:quit (write-app appname features)))))

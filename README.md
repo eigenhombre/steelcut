@@ -153,7 +153,10 @@ YAML parsing and generation by Fernando Borretti's
 [cl-yaml](https://github.com/eudoxia0/cl-yaml/).
 (NOTE: you must have `libyaml-dev` installed for this to work!)
 
-Each option provides necessary dependencies and an example of usage.
+Each option provides necessary dependencies and an example of usage in the
+generated project.
+
+It is not allowed to use any supported feature name as the project name.
 
 Planned additional selectable features:
 
