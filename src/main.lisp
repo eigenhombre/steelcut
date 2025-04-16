@@ -556,9 +556,17 @@ The default features are: ~a
       (distinct features))))
 
 (defun main ()
-  (let* ((args sb-ext::*posix-argv*)
+  (let* ((args (uiop:command-line-arguments))
          (appname (second args))
          (features (select-args (parse-args (cddr args)))))
-    (if (find "-h" args :test #'equal)
-        (println (usage))
-        (uiop:quit (write-app appname features)))))
+    (flet ((inargs (x) (member x args :test #'equal)))
+      (cond
+        ((or (inargs "-h")
+             ;; Currently does NOT work, SBCL hijacks option:
+             (inargs "--help"))
+         (println (usage)))
+        ((or (inargs "-v")
+             (inargs "--version"))
+         ;; WIP #4:
+         (println "0.0.0"))
+        (t (uiop:quit (write-app appname features)))))))
