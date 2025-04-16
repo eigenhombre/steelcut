@@ -16,15 +16,16 @@ program.
 
 - Projects can be generated and built using
   [SBCL](https://en.wikipedia.org/wiki/Steel_Bank_Common_Lisp), a
-    free, fast and multi-platform Lisp system
-- Generated projects have selectable features as outlined in [Feature Selection](#feature-selection), below
+    free, fast and multi-platform Lisp system.
+- Generated projects have selectable features as outlined in [Feature
+  Selection](#feature-selection), below.
 - Build stand-alone binaries for the current architecture with one
-  command (`make`)
-- Install using `make install`
-- Run unit tests for current project `make test`
+  command (`make`).
+- Install using `make install`.
+- Run unit tests for current project with `make test`.
 - Run tests and build sample project within Docker (`make docker`)
   - Do the above in the GitHub Actions CI system (see generated
-    `build.yml`)
+    `build.yml`).
   - Smoke-test all single features and all two-feature combinations
     to avoid obvious conflicts, e.g. symbol collisions.
 
@@ -34,7 +35,7 @@ Pretty alpha.  I'm using it, probably nobody else is.
 
 Tested only on `(and SBCL (or (Mac M1) (and Docker Ubuntu))))`.
 
-# Building
+# Building Steelcut
 
 ## Prerequisites
 
@@ -44,7 +45,7 @@ Tested only on `(and SBCL (or (Mac M1) (and Docker Ubuntu))))`.
   and on your `PATH`.  I use `$HOME/bin`.
 - `LISP_HOME` also exists as a directory and defined.
 
-To build `steelcut`, check out this repo and `cd` to it.  Then,
+To build `steelcut`, check out the current repo and `cd` to it.  Then,
 
     $ make
     # Assuming BINDIR defined and on your PATH; I use ~/bin ...:
