@@ -10,4 +10,4 @@ sbcl --non-interactive \
      --eval '(pushnew (truename ".") ql:*local-project-directories*)' \
      --eval '(ql:register-local-projects)' \
      --eval '(ql:quickload :steelcut)' \
-     --eval '(progn (sb-ext:disable-debugger) (sb-ext:save-lisp-and-die "steelcut" :toplevel #'"'"'steelcut:main :executable t))'
+     --eval '(progn (sb-ext:disable-debugger) (sb-ext:save-lisp-and-die "steelcut" :toplevel #'"'"'steelcut:main :executable t :purify t :compression t :save-runtime-options nil))'
