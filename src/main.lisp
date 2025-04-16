@@ -6,10 +6,10 @@
 (defparameter +available-features+
   (append +default-features+
           '(:cmd
+            :csv
             :args
             :yaml
             ;; Future:
-            ;; :csv
             ;; :json
             ;; :time
             ;; :webclient
@@ -129,13 +129,26 @@ PROJNAME
 
 (defun cl-oju-example ()
   "(defun cl-oju-example ()
+  \"See also: https://github.com/eigenhombre/cl-oju\"
   (println (->> (range 10)
                 (take-while (partial #'> 5))
                 (drop 2))))
 ")
 
+(defun csv-example ()
+  "(defun csv-example ()
+  \"See also: https://github.com/AccelerationNet/cl-csv\"
+  (print (cl-csv:read-csv \"a,b,c
+x,y,z\"))
+  ;;=>
+  ;; ((\"a\", \"b\", \"c\") (\"z\", \"y\", \"z\")
+  (fresh-line)
+)
+")
+
 (defun yaml-example ()
   "(defun yaml-example ()
+  \"See also: https://github.com/eudoxia0/cl-yaml\"
   (format t \"~a~%\" (yaml:parse \"[1, 2, 3]\"))
   ;;=>
   ;; (1 2 3)
@@ -154,10 +167,12 @@ PROJNAME
                                     "(in-package #:PROJNAME)
 
 "
-                                    (str-when (has-feature :cmd features)
-                                              (cmd-example))
                                     (str-when (has-feature :cl-oju features)
                                               (cl-oju-example))
+                                    (str-when (has-feature :cmd features)
+                                              (cmd-example))
+                                    (str-when (has-feature :csv features)
+                                              (csv-example))
                                     (str-when (has-feature :yaml features)
                                               (yaml-example))
                                     (str-when (has-feature :args features)
@@ -166,10 +181,12 @@ PROJNAME
                                     (funcall (if (has-feature :args features)
                                                  #'adopt-main-fmt
                                                  #'main-fmt)
-                                             (str-when (has-feature :cmd features)
-                                                       "  (cmd-example)")
                                              (str-when (has-feature :cl-oju features)
                                                        "  (cl-oju-example)")
+                                             (str-when (has-feature :cmd features)
+                                                       "  (cmd-example)")
+                                             (str-when (has-feature :csv features)
+                                                       "  (csv-example)")
                                              (str-when (has-feature :yaml features)
                                                        "  (yaml-example)")))))
 
@@ -331,8 +348,9 @@ sbcl --non-interactive \\
         for deps = (case f
                      (:args (list :adopt))
                      (:cl-oju (list :arrows :cl-oju))
-                     (:yaml (list :cl-yaml))
                      (:cmd (list :cmd))
+                     (:csv (list :cl-csv))
+                     (:yaml (list :cl-yaml))
                      ;; Docker/CI do not add CL deps.
                      )
         append deps))
@@ -431,27 +449,36 @@ The default features are: ~a
   (some (lambda (kw) (string= (string-upcase str) (symbol-name kw)))
         keywords))
 
+
 (defun write-app (appname features)
-  (cond
-    ((not appname)
-     (format t "~a~%"(usage))
-     0)
+  (let ((unsupported-features
+          (remove-if (lambda (f) (member f +available-features+))
+                     features)))
+    (cond
+      ((not appname)
+       (format t "~a~%"(usage))
+       0)
 
-    ((find-project appname)
-     (format t "Project ~a already exists!~%" appname)
-     1)
+      (unsupported-features
+       (format t "The following features are not supported: ~{~a~^, ~}~%"
+               unsupported-features)
+       1)
 
-    ((string-matches-keywords-p appname +available-features+)
-     (format t "'~a' is a feature, not allowed as app name!~%" appname)
-     1)
+      ((find-project appname)
+       (format t "Project ~a already exists!~%" appname)
+       1)
 
-    (t (progn
-         (make-project appname features)
-         (format t
-                 "Project ~a created (features: ~a).  Thanks for using steelcut!~%"
-                 appname
-                 (feature-list-string features))
-         0))))
+      ((string-matches-keywords-p appname +available-features+)
+       (format t "'~a' is a feature, not allowed as app name!~%" appname)
+       1)
+
+      (t (progn
+           (make-project appname features)
+           (format t
+                   "Project ~a created (features: ~a).  Thanks for using steelcut!~%"
+                   appname
+                   (feature-list-string features))
+           0)))))
 
 ;; CLI argument parsing:
 (defun starts-with (s c)
@@ -512,8 +539,6 @@ The default features are: ~a
     (let ((features (copy-list +default-features+)))
       ;; Add selected features:
       (dolist (s selected)
-        (when (not (supported-feature (kw s)))
-          (error-quit "Unsupported feature:" s))
         (push s features))
       ;; Remove deselected features:
       (dolist (d deselected)

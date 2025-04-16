@@ -147,6 +147,9 @@
 (defun has-yaml-example-p (source)
   (cl-ppcre:scan "(?i)\\(\\s*defun\\s+yaml-example\\b" source))
 
+(defun has-csv-example-p (source)
+  (cl-ppcre:scan "(?i)\\(\\s*defun\\s+csv-example\\b" source))
+
 (test cannot-create-project-whose-name-is-a-feature-name
   (loop for feat in +default-features+
         do (with-temporary-dir (d)
@@ -246,3 +249,17 @@
       (is (member :cl-yaml (deps)))
       ;; It contains the example function:
       (is (has-yaml-example-p main-text)))))
+
+(test csv-feature
+  (with-setup appname "testingapp" appdir deps (remove :csv +default-features+)
+    (let ((main-text (slurp (join/ appdir "src/main.lisp"))))
+      ;; :cl-csv is NOT there:
+      (is (not (member :cl-csv (deps))))
+      ;; It contains the example function:
+      (is (not (has-csv-example-p main-text)))))
+  (with-setup appname "testingapp" appdir deps (cons :csv +default-features+)
+    (let ((main-text (slurp (join/ appdir "src/main.lisp"))))
+      ;; :cl-csv is NOT there:
+      (is (member :cl-csv (deps)))
+      ;; It contains the example function:
+      (is (has-csv-example-p main-text)))))
