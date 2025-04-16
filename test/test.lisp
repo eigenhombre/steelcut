@@ -188,78 +188,25 @@
   (second (drop-while (lambda (x) (not (equal x :depends-on)))
                       raw-asd)))
 
-(test cmd-feature-adds-dependency-and-example
-  (with-setup appname "testingapp" appdir deps +default-features+
-    (let ((main-text (slurp (join/ appdir "src/main.lisp"))))
-      ;; :cmd is not there:
-      (is (not (member :cmd (deps))))
-      ;; It doesn't contain the example function:
-      (is (not (has-cmd-example-p main-text)))))
-
-  ;; Add :cmd to features, should get the new dependency:
-  (with-setup appname "test2" appdir deps (cons :cmd +default-features+)
-    (let ((main-text (slurp (join/ appdir "src/main.lisp"))))
-      ;; :cmd is now there:
-      (is (member :cmd (deps)))
-      ;; It contains the example function:
-      (is (has-cmd-example-p main-text)))))
-
-(test cl-oju-feature
-  (with-setup appname "testingapp" appdir deps (cons :cl-oju +default-features+)
-    (let ((main-text (slurp (join/ appdir "src/main.lisp"))))
-      ;; :cl-oju and :arrows are dependencies:
-      (is (member :cl-oju (deps)))
-      (is (member :arrows (deps)))
-      ;; It contains the example function:
-      (is (has-cl-oju-example-p main-text))))
-  (with-setup appname "testingapp" appdir deps (remove :cl-oju +default-features+)
-    (let ((main-text (slurp (join/ appdir "src/main.lisp"))))
-      ;; :cl-oju is NOT there:
-      (is (not (member :cl-oju (deps))))
-      ;; :arrows is NOT there:
-      ;; (is (not (member :arrows (deps))))
-      ;; It does NOT contain the example function:
-      (is (not (has-cl-oju-example-p main-text))))))
-
-(test args-feature
-  (with-setup appname "testingapp" appdir deps (remove :args +default-features+)
-    (let ((main-text (slurp (join/ appdir "src/main.lisp"))))
-      ;; :adopt is NOT there:
-      (is (not (member :adopt (deps))))
-      ;; It contains the example function:
-      (is (not (has-adopt-example-p main-text)))))
-  (with-setup appname "testingapp" appdir deps (cons :args +default-features+)
-    (let ((main-text (slurp (join/ appdir "src/main.lisp"))))
-      ;; :adopt is NOT there:
-      (is (member :adopt (deps)))
-      ;; It contains the example function:
-      (is (has-adopt-example-p main-text)))))
-
-
-(test yaml-feature
-  (with-setup appname "testingapp" appdir deps (remove :yaml +default-features+)
-    (let ((main-text (slurp (join/ appdir "src/main.lisp"))))
-      ;; :cl-yaml is NOT there:
-      (is (not (member :cl-yaml (deps))))
-      ;; It contains the example function:
-      (is (not (has-yaml-example-p main-text)))))
-  (with-setup appname "testingapp" appdir deps (cons :yaml +default-features+)
-    (let ((main-text (slurp (join/ appdir "src/main.lisp"))))
-      ;; :cl-yaml IS there:
-      (is (member :cl-yaml (deps)))
-      ;; It contains the example function:
-      (is (has-yaml-example-p main-text)))))
-
-(test csv-feature
-  (with-setup appname "testingapp" appdir deps (remove :csv +default-features+)
-    (let ((main-text (slurp (join/ appdir "src/main.lisp"))))
-      ;; :cl-csv is NOT there:
-      (is (not (member :cl-csv (deps))))
-      ;; It contains the example function:
-      (is (not (has-csv-example-p main-text)))))
-  (with-setup appname "testingapp" appdir deps (cons :csv +default-features+)
-    (let ((main-text (slurp (join/ appdir "src/main.lisp"))))
-      ;; :cl-csv is NOT there:
-      (is (member :cl-csv (deps)))
-      ;; It contains the example function:
-      (is (has-csv-example-p main-text)))))
+(test feature-deps-and-examples
+  (loop for (feature deplist fn-check) in
+        '((:args   (:adopt)          has-adopt-example-p)
+          (:cmd    (:cmd)            has-cmd-example-p)
+          (:cl-oju (:arrows :cl-oju) has-cl-oju-example-p)
+          (:csv    (:cl-csv)         has-csv-example-p)
+          (:yaml   (:cl-yaml)        has-yaml-example-p))
+        do
+           (with-setup appname "testingapp" appdir deps (remove feature +default-features+)
+             (let ((main-text (slurp (join/ appdir "src/main.lisp"))))
+               ;; The associated dependency is NOT there:
+               (loop for dep in deplist
+                     do (is (not (member dep (deps)))))
+               ;; It does NOT contain the example function:
+               (is (not (funcall fn-check main-text)))))
+           (with-setup appname "testingapp" appdir deps (cons feature +default-features+)
+             (let ((main-text (slurp (join/ appdir "src/main.lisp"))))
+               ;; The associated dependency is now there:
+               (loop for dep in deplist
+                     do (is (member dep (deps))))
+               ;; It contains the example function:
+               (is (funcall fn-check main-text))))))
