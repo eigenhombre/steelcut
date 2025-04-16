@@ -163,7 +163,9 @@ YAML parsing and generation by Fernando Borretti's
 Each option provides necessary dependencies and an example of usage in the
 generated project.
 
-It is not allowed to use any supported feature name as the project name.
+To handle the case where the user forgets to supply the application
+name, `steelcut` will not allow you to use a supported feature name as
+the project name.
 
 Planned additional selectable features:
 
