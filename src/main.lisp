@@ -556,7 +556,7 @@ The default features are: ~a
       (distinct features))))
 
 (defun main ()
-  (let* ((args (uiop:command-line-arguments))
+  (let* ((args sb-ext::*posix-argv*)
          (appname (second args))
          (features (select-args (parse-args (cddr args)))))
     (flet ((inargs (x) (member x args :test #'equal)))
