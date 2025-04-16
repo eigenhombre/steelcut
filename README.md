@@ -25,6 +25,8 @@ program.
 - Run tests and build sample project within Docker (`make docker`)
   - Do the above in the GitHub Actions CI system (see generated
     `build.yml`)
+  - Smoke-test all single features and all two-feature combinations
+    to avoid obvious conflicts, e.g. symbol collisions.
 
 # Status
 
@@ -142,6 +144,11 @@ Clojure functions.
 
 Uses [Paul Rodriguez's library](https://github.com/ruricolist/cmd) for
 interacting with the shell.
+
+### `csv` (disabled by default)
+
+Use [`cl-csv`](https://github.com/AccelerationNet/cl-csv) to
+facilitate reading and writing of CSV data.
 
 ### `args` (disabled by default)
 

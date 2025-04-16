@@ -24,6 +24,7 @@ FEATURES=(
   ci
   cl-oju
   cmd
+  csv
   docker
   yaml
 )

@@ -191,16 +191,24 @@ x,y,z\"))
                                                        "  (yaml-example)")))))
 
 (defun add-main-package (projname features)
-  (render-project-file projname
-                       "src/package.lisp"
-                       (format nil "(defpackage PROJNAME
+  (let* ((deps (deps-for-features features))
+         ;; if :cl-oju is present, skip :cl-csv in :use to avoid
+         ;; FILTER conflict:
+         (use (remove-duplicates
+               (remove :adopt
+                       (cond
+                         ((member :cl-oju features)
+                          (remove :cl-csv deps))
+                         (t deps)))
+               :test #'eq)))
+    (render-project-file projname
+                         "src/package.lisp"
+                         (format nil "(defpackage ~A
   (:use ~{~S~^ ~})
   (:export :main))
 "
-                               (->> features
-                                    deps-for-features
-                                    (remove :adopt)
-                                    (cons :cl)))))
+                                 projname
+                                 (cons :cl use)))))
 
 (defun add-test-lisp (projname)
   (render-project-file projname
