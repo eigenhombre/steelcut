@@ -31,7 +31,9 @@ program.
 
 # Status
 
-Pretty alpha.  I'm using it, probably nobody else is.
+Pretty alpha.  I'm using it, probably nobody else is.  See
+[Prior Art](#prior-art) for some other Common Lisp project
+generators.
 
 Tested only on `(and SBCL (or (Mac M1) (and Docker Ubuntu))))`.
 
@@ -181,6 +183,22 @@ files.  `make docker` runs a test script `test-all-features` which
 generates and tests all single and double combinations of features.
 **This is best run in Docker** to avoid polluting your `$LISP_HOME`
 with lots of temporary projects.
+
+# Prior Art
+
+There are quite a few Common Lisp project generators out there; some
+look more opinionated than others, and/or have specific focus geared
+towards games, web applications, etc.  I haven't tried any of them.
+
+- Alexander Artemenko: [`project-templates`](https://github.com/40ants/project-templates)
+- Andrew Kravchuk: [`cookiecutter-lisp-game`](https://github.com/lockie/cookiecutter-lisp-game)
+- `vindarel`: [`cl-cookieweb`](https://github.com/vindarel/cl-cookieweb)
+- Anthony Green: [`make-like`](https://github.com/container-lisp/make-like)
+- Rajasegar Chandran: [`cl-webapp-seed`](https://github.com/rajasegar/cl-webapp-seed)
+- Mikel Evins: [`electron-lisp-boilerplate`](https://github.com/mikelevins/electron-lisp-boilerplate)
+- Sebastian Carlos: [`cl-yasboi`](https://github.com/sebastiancarlos/cl-yasboi)
+
+(Thanks to Alexander Artemenko for supplying this list.)
 
 # License
 
