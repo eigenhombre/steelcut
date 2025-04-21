@@ -1,11 +1,5 @@
 #!/bin/bash
-# Test all feature permutations from
-# the set:
-#
-#   ci docker cmd cl-oju args
-# Test:
-# - single features
-# - all pairs of features
+# Test all one- and two-feature combinations.
 
 set -e
 
@@ -26,6 +20,7 @@ FEATURES=(
   cmd
   csv
   docker
+  json
   yaml
 )
 

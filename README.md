@@ -161,7 +161,11 @@ Provides argument processing via Steve Losh's [Adopt](https://github.com/sjl/ado
 
 YAML parsing and generation by Fernando Borretti's
 [cl-yaml](https://github.com/eudoxia0/cl-yaml/).
-(NOTE: you must have `libyaml-dev` installed for this to work!)
+NOTE: you must have `libyaml-dev` installed for this to work!
+
+### `json` (disabled by default)
+
+JSON parsing and generation using [cl-json](https://github.com/sharplispers/cl-json).
 
 Each option provides necessary dependencies and an example of usage in the
 generated project.
@@ -172,8 +176,8 @@ the project name.
 
 Planned additional selectable features:
 
-    :csv         :json        :time
-    :webclient   :webserver   :xml
+    :csv         :time        :xml
+    :webclient   :webserver
 
 # Testing Steelcut
 

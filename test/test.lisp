@@ -150,6 +150,9 @@
 (defun has-csv-example-p (source)
   (cl-ppcre:scan "(?i)\\(\\s*defun\\s+csv-example\\b" source))
 
+(defun has-json-example-p (source)
+  (cl-ppcre:scan "(?i)\\(\\s*defun\\s+json-example\\b" source))
+
 (test cannot-create-project-whose-name-is-a-feature-name
   (loop for feat in +default-features+
         do (with-temporary-dir (d)
@@ -194,6 +197,7 @@
           (:cmd    (:cmd)            has-cmd-example-p)
           (:cl-oju (:arrows :cl-oju) has-cl-oju-example-p)
           (:csv    (:cl-csv)         has-csv-example-p)
+          (:json   (:cl-json)        has-json-example-p)
           (:yaml   (:cl-yaml)        has-yaml-example-p))
         do
            (with-setup appname "testingapp" appdir deps (remove feature +default-features+)

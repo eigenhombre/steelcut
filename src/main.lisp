@@ -5,12 +5,12 @@
 
 (defparameter +available-features+
   (append +default-features+
-          '(:cmd
+          '(:args
+            :cmd
             :csv
-            :args
+            :json
             :yaml
             ;; Future:
-            ;; :json
             ;; :time
             ;; :webclient
             ;; :webserver
@@ -160,6 +160,17 @@ x,y,z\"))
 )
 ")
 
+(defun json-example ()
+  "(defparameter *raw* \"{
+  \\\"hello\\\": \\\"world\\\",
+  \\\"count\\\": 66
+  }\")
+
+(defun json-example ()
+  (let ((parsed (decode-json-from-string *raw*)))
+    (format t \"~a~%\" parsed)))
+")
+
 (defun add-main-lisp (projname features)
   (render-project-file projname
                        "src/main.lisp"
@@ -175,6 +186,8 @@ x,y,z\"))
                                               (csv-example))
                                     (str-when (has-feature :yaml features)
                                               (yaml-example))
+                                    (str-when (has-feature :json features)
+                                              (json-example))
                                     (str-when (has-feature :args features)
                                               *adopt-setup*)
                                     ;; Apply either Adopt-style or vanilla main:
@@ -187,6 +200,8 @@ x,y,z\"))
                                                        "  (cmd-example)")
                                              (str-when (has-feature :csv features)
                                                        "  (csv-example)")
+                                             (str-when (has-feature :json features)
+                                                       "  (json-example)")
                                              (str-when (has-feature :yaml features)
                                                        "  (yaml-example)")))))
 
@@ -358,6 +373,7 @@ sbcl --non-interactive \\
                      (:cl-oju (list :arrows :cl-oju))
                      (:cmd (list :cmd))
                      (:csv (list :cl-csv))
+                     (:json (list :cl-json))
                      (:yaml (list :cl-yaml))
                      ;; Docker/CI do not add CL deps.
                      )
